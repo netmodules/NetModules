@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetModules.ChatBot.Events\NetModules.ChatBot.Events.csproj" />
+    <ProjectReference Include="..\NetModules\NetModules.csproj" />
+  </ItemGroup>
+
+</Project>

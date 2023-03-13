@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>John Earnshaw</Authors>
+    <RepositoryUrl>https://github.com/johnearnshaw/NetModules</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <Copyright>John Earnshaw</Copyright>
+    <PackageTags>event driven plugins plugin modules module modular framework architecture</PackageTags>
+    <PackageLicenseUrl>https://tldrlegal.com/license/mit-license</PackageLicenseUrl>
+    <Description>A .NET 6 open-source framework for constructing event-driven modular systems. This project was started as a simple project to demonstrate a basic implementation of .NET Managed Extensibility Framework (MEF). It has since grown into an advanced framework designed to simplify building cross-platform, event-driven, plugin-based, and modular applications using .NET and platforms that support .NET 6 class libraries.</Description>
+    <Version>1.2.8</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile />
+  </PropertyGroup>
+
+</Project>

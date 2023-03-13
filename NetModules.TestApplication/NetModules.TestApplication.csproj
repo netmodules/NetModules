@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+    <!-- 
+    The following node forces nuget packages to be copied to the build output directory.
+    This is not really necessary in the main Modules framework TestApplication as we are loading only internally shared projects.
+    This node is required to copy dll from nuget package to the build directory so that ModuleHost can load external modules via reflection.
+    -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetModules.ChatBot.Events\NetModules.ChatBot.Events.csproj" />
+    <ProjectReference Include="..\NetModules.ChatBot\NetModules.ChatBot.csproj" />
+    <ProjectReference Include="..\NetModules\NetModules.csproj" />
+  </ItemGroup>
+
+</Project>
