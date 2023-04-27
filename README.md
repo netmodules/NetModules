@@ -32,7 +32,7 @@ The layout of the projects within the NetModules directory and solution is to de
   
 The core project and examples are well documented and if you get stuck or have any questions, please contact me and I'll be glad to help out.
 
-For further documentation please see the [repository wiki](https://github.com/johnearnshw/NetModules/wiki).
+For further documentation please see the [repository wiki](https://github.com/johnearnshaw/NetModules/wiki).
 ___
 
 ### Contribution guidelines ###
