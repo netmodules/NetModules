@@ -49,4 +49,4 @@ ___
 ### License ###
 
 * [The MIT License (MIT)](https://tldrlegal.com/license/mit-license) - You are free to use NetModules in commercial projects and modify/redistribute the source code provided the copyright notice is not removed.
-* If you use NetModules in your own project I would love to hear about it, so drop me a line (and even a credit to NetModules in your project if you feel like being really generous). We would be very happy to hear about your experiences using my NetModules class library in your projects and any suggestions you may have for me to make it better.
+* If you use NetModules in your own project I would love to hear about it, so drop me a line (and even a credit to NetModules in your project if you feel like being really generous). I would be very happy to hear about your experiences using my NetModules class library in your projects and any suggestions you may have for me to make it better.
