@@ -9,7 +9,7 @@ ___
 
 NetModules is an [MIT license](https://tldrlegal.com/license/mit-license) .NET 6 C# Class Library that offers an open-source system for creating [event-driven](https://en.wikipedia.org/wiki/Event-driven_architecture), modular and [plugin-based](https://en.wikipedia.org/wiki/Plug-in_(computing)) applications. 
 
-This project was started as a example project that demonstrated an implementation of [Managed Extensibility Framework (MEF)](https://msdn.microsoft.com/en-us/magazine/ee291628.aspx). A framework included in Microsoft .NET Framework 4.0 and is also available as an external component at [codeplex](https://mef.codeplex.com/) for older versions of .NET Framework.
+This project was started as a simple example project that demonstrated an implementation of [Managed Extensibility Framework (MEF)](https://msdn.microsoft.com/en-us/magazine/ee291628.aspx). A framework included in Microsoft .NET Framework 4.0 and is also available as an external component at [codeplex](https://mef.codeplex.com/) for older versions of .NET Framework.
 
 It was to demonstrate the architecture and benifits of a strict modular design pattern for developing complex applications.
 
