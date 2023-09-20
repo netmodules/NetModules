@@ -28,14 +28,14 @@ namespace NetModules.Interfaces
     /// <summary>
     /// An interface that allows you to inspect an instance of IEvent before it starts processing.
     /// </summary>
-    public interface IEventPreHandler<E> : IEventPreHandler
-        where E : IEvent
+    public interface IEventPreHandler<T> : IEventPreHandler
+        where T : IEvent
     {
         ///// <summary>
         ///// This should be invoked by IModuleHost before its implementing IEventHandler handles an IEvent.
         ///// </summary>
         ///// <param name="e"></param>
-        //void OnBeforeHandle(IEvent e);
+        //void OnBeforeHandle(T e);
     }
 
     /// <summary>

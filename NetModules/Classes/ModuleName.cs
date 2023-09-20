@@ -31,7 +31,7 @@ namespace NetModules
     /// <see cref="ModuleName"/> This class acts as a simple string wrapper to offer a more self descriptive usage type.
     /// </summary>
     [Serializable]
-    public class ModuleName
+    public struct ModuleName
     {
         /// <summary>
         /// Holds the string value of the module name.

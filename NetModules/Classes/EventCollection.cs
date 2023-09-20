@@ -56,7 +56,7 @@ namespace NetModules.Classes
                 throw new Exception("Events already imported. Importing events multiple times would cause multiple instances of all known events.");
             }
 
-            var events = TypeManager.FindEvents<IEvent>(Host.WorkingDirectory, 1);
+            var events = TypeManager.FindEvents<IEvent>(Host, Host.WorkingDirectory, 1);
 
             Host.Log(LoggingEvent.Severity.Debug, $"Importing {events.Count} events...");
 

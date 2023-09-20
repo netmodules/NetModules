@@ -54,35 +54,41 @@ namespace NetModules
 
 
         /// <summary>
-        /// The Dscription property allows you to briefly explain what this module is used for.
+        /// The Description property allows you to briefly explain what this module is used for. Description is
+        /// not explicitly required and some applications may not use this data.
         /// </summary>
         public string Description { get; set; }
 
 
         /// <summary>
-        /// AdditionalInformation can be used to provide any further information and instructions for usage.
+        /// AdditionalInformation can be used to provide any further information and/or instructions for module
+        /// usage. AdditionalInformation is not explicitly required and some applications may not use this data.
         /// </summary>
         public string[] AdditionalInformation { get; set; } = new string[] { };
 
 
         /// <summary>
-        /// Dependencies can contain a list of modules that must be available and loaded for this module to handle events.
+        /// Dependencies can contain a list of modules that must be available and loaded for this module to handle
+        /// events. Dependencies are identified by ModuleName and if a dependency is not found an exception will be
+        /// thrown on module loading. Dependencies are not required and it is possible to implement your own
+        /// unhandled event/dependency logic.
         /// </summary>
         public string[] Dependencies { get; set; } = new string[] { };
 
         
         /// <summary>
         /// This allows the instance of IModule to inform IModuleHost of the priority that it would like to handle
-        /// IEvents. It means that if 2 or more instances of IModule handle the same types that implement IEvent, you
-        /// can control the order that IModule handles the IEvent first. A lower value for this property will tell
-        /// IModuleHost that this IModule wants to handle the IEvent first.
+        /// IEvents. It means that if 2 or more instances of IModule handle the same type that implements IEvent,
+        /// you can control which IModule handles the IEvent first. A lower value for this property will tell
+        /// IModuleHost that this IModule wants to handle the IEvent first. Defaults to zero.
         /// </summary>
         public short HandlePriority { get; set; }
 
 
         /// <summary>
         /// This allows the instance of IModule to inform IModuleHost of the priority that it should be loaded.
-        /// A lower value for this property will tell IModuleHost that this IModule wants to load before other modules
+        /// A lower value for this property will tell IModuleHost that this IModule wants to load before other
+        /// modules. Defaults to zero.
         /// </summary>
         public short LoadPriority { get; set; }
 
@@ -90,8 +96,8 @@ namespace NetModules
         /// <summary>
         /// This property tells the ModuleHost to fully load the instance of IModule before loading other modules.
         /// This will work alongside LoadPriority but should be considered as loading of primary and secondary modules
-        /// where an IModule instance with LoadFirst set to true would trigger both OnLoading() and Onloaded() before
-        /// other module instances.
+        /// where an IModule instance with LoadFirst set to true will invoke both OnLoading() and Onloaded() before
+        /// other module instances. Defaults to false.
         /// </summary>
         public bool LoadFirst { get; set; }
 
@@ -100,6 +106,7 @@ namespace NetModules
         /// Returns a unique ID for the IModule instance.
         /// </summary>
         public string ID { get { return string.Format("{0}-{1}", Name, Unique); } }
+
 
         /// <summary>
         /// 

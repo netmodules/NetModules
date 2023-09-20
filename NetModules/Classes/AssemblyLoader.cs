@@ -44,11 +44,13 @@ namespace NetModules.Classes
         static Dictionary<string, Assembly> ReferencedAssemblies;
         object Padlock = new object();
 
+        internal bool KeepAlive;
 
         /// <summary>
         /// 
         /// </summary>
-        public AssemblyLoader(AssemblyName name)
+        public AssemblyLoader(AssemblyName name, bool keepAlive = false)
+            //: base(!keepAlive)
         {
             if (name == null)
             {
@@ -57,13 +59,15 @@ namespace NetModules.Classes
 
             AttachEvents();
             AssemblyIdentifier = name.FullName;
+            KeepAlive = keepAlive;
         }
 
 
         /// <summary>
         /// 
         /// </summary>
-        public AssemblyLoader(Uri path)
+        public AssemblyLoader(Uri path, bool keepAlive = false)
+            //: base(!keepAlive)
         {
             if (path == null || !path.IsFile)
             {
@@ -72,6 +76,7 @@ namespace NetModules.Classes
 
             AttachEvents();
             AssemblyIdentifier = path.LocalPath;
+            KeepAlive = keepAlive;
         }
 
 
@@ -104,8 +109,21 @@ namespace NetModules.Classes
         /// </summary>
         private void AssemblyLoader_Unloading(AssemblyLoadContext obj)
         {
-            obj.Unload();
-            //throw new NotImplementedException();
+            if (obj is AssemblyLoader loader && loader.KeepAlive)
+            {
+                // Garbage collector tries to collect our Module's AssemblyLoadContext even though
+                // it's globally referenced in ModuleContainer. To try and avoid errors we tell GC
+                // to keep alive so that ModuleHost.ModuleCollection still holds the reference to
+                // the Module instance while the AssemblyLoadContext may have been destroyed..?
+                // KeepAlive seems to fix spontaneous fatal error. Internal CLR error. (0x80131506)
+                // Although it may be enough to just not call our unload method. Needs more testing...
+                GC.KeepAlive(obj);
+                GC.SuppressFinalize(obj);
+            }
+            else
+            {
+                this.Unload();
+            }
         }
 
 
@@ -121,8 +139,9 @@ namespace NetModules.Classes
         /// <summary>
         /// 
         /// </summary>
-        public Assembly Load()
+        public Assembly Load(bool keepAlive = false)
         {
+            KeepAlive = keepAlive;
             return Load(AssemblyIdentifier);
         }
 
@@ -256,18 +275,25 @@ namespace NetModules.Classes
         /// <summary>
         /// 
         /// </summary>
-        public void Unload()
+        public new void Unload()
         {
             if (LoadedAssembly != null)
             {
                 LoadedAssembly = null;
             }
 
-            // Don't remove referenced assemblies!
-            //if (ReferencedAssemblies != null)
-            //{
-            //    ReferencedAssemblies = null;
-            //}
+            KeepAlive = false;
+
+            // Possibly don't remove referenced assemblies???
+            if (ReferencedAssemblies != null)
+            {
+                ReferencedAssemblies = null;
+            }
+
+            GC.ReRegisterForFinalize(this);
+
+            // base.Unload();
+            // ^^^^^^^^^^^^^^ Throws Fatal error. Internal CLR error. (0x80131506)
         }
 
 

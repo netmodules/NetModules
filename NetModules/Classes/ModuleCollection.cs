@@ -235,7 +235,7 @@ namespace NetModules.Classes
                         Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
                             , c.ModuleAttributes);
                         c.Module.OnLoading();
-                        c.Module.Loaded = true;
+                        
                     }
                 }
 
@@ -248,11 +248,12 @@ namespace NetModules.Classes
 
                     // Finally we invoke OnLoaded on each module in the order that they should be loaded. This is decided
                     // in the ImportModules method and when the imported modules are added to this collection.
-                    if (c.Module.Loaded)
+                    if (!c.Module.Loaded)
                     {
                         c.Module.OnLoaded();
                         Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
                             , c.ModuleAttributes);
+                        c.Module.Loaded = true;
                     }
                 }
             }
@@ -273,7 +274,6 @@ namespace NetModules.Classes
                     Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
                             , c.ModuleAttributes);
                     c.Module.OnLoading();
-                    c.Module.Loaded = true;
                 }
             }
 
@@ -286,11 +286,12 @@ namespace NetModules.Classes
 
                 // Finally we invoke OnLoaded on each module in the order that they should be loaded. This is decided
                 // in the ImportModules method and when the imported modules are added to this collection.
-                if (c.Module.Loaded)
+                if (!c.Module.Loaded)
                 {
                     c.Module.OnLoaded();
                     Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
                             , c.ModuleAttributes);
+                    c.Module.Loaded = true;
                 }
             }
 
@@ -334,12 +335,11 @@ namespace NetModules.Classes
 
                 // We set the Module.Unloaded property to false here so that the module will no longer be returned
                 // when ModuleHost calls GetLoadedModules method.
-                if (c.Module.Loaded)
+                if (c.Module != null && c.Module.Loaded)
                 {
                     Host.Log(LoggingEvent.Severity.Debug, "Unloading module..."
                             , c.ModuleAttributes);
                     c.Module.OnUnloading();
-                    c.Module.Loaded = false;
                 }
             }
 
@@ -350,11 +350,12 @@ namespace NetModules.Classes
                     continue;
                 }
 
-                if (c.Module.Loaded)
+                if (c.Module != null && c.Module.Loaded)
                 {
                     c.Module.OnUnloaded();
                     Host.Log(LoggingEvent.Severity.Debug, "Unloaded module..."
                             , c.ModuleAttributes);
+                    c.Module.Loaded = false;
                 }
             }
 

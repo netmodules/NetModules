@@ -87,7 +87,7 @@ namespace NetModules.Classes
             Path = path;
             ModuleType = type;
             ModuleAttributes = attribute;
-            LoadContext = new AssemblyLoader(path);
+            LoadContext = new AssemblyLoader(path, true);
         }
 
 
@@ -95,7 +95,7 @@ namespace NetModules.Classes
         /// <inheritdoc/>
         public void InitializeModule()
         {
-            LoadContext.Load();
+            LoadContext.Load(true);
             var module = TypeManager.InstantiateModule(ModuleType, LoadContext);
             module.ModuleAttributes = ModuleAttributes;
             module.Host = Host;
@@ -107,7 +107,11 @@ namespace NetModules.Classes
         public void DeinitializeModule()
         {
             Module = null;
-            LoadContext.Unload();
+            
+            if (LoadContext.IsCollectible)
+            {
+                LoadContext.Unload();
+            }
         }
 
 

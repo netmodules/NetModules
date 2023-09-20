@@ -51,7 +51,7 @@ namespace NetModules.Classes
         /// <param name="directoryDepth">How many subdirectories deep of path be searched.</param>
         public static IList<IModuleContainer> FindModules<T>(IModuleHost host, Uri path, int directoryDepth = int.MaxValue) where T : Module
         {
-            var types = DllTypeSearch(typeof(T), path, directoryDepth);
+            var types = DllTypeSearch(host, typeof(T), path, directoryDepth);
             var containers = new List<IModuleContainer>();
 
             foreach (var t in types)
@@ -80,9 +80,9 @@ namespace NetModules.Classes
         /// </summary>
         /// <param name="path">Where to search for DLL's that export IEvent.</param>
         /// <param name="directoryDepth">How many subdirectories deep of path be searched.</param>
-        public static IList<Type> FindEvents<T>(Uri path, int directoryDepth = int.MaxValue) where T : IEvent
+        public static IList<Type> FindEvents<T>(IModuleHost host, Uri path, int directoryDepth = int.MaxValue) where T : IEvent
         {
-            var types = DllTypeSearch(typeof(T), path, directoryDepth);
+            var types = DllTypeSearch(host, typeof(T), path, directoryDepth);
             var events = new List<Type>();
 
             foreach (var t in types)
@@ -102,7 +102,7 @@ namespace NetModules.Classes
         /// <summary>
         /// 
         /// </summary>
-        private static List<Type> DllTypeSearch(Type @type, Uri path, int directoryDepth = int.MaxValue)
+        private static List<Type> DllTypeSearch(IModuleHost host, Type @type, Uri path, int directoryDepth = int.MaxValue)
         {
             var startingDepth = Count(Path.DirectorySeparatorChar, path.LocalPath);
 
@@ -115,7 +115,7 @@ namespace NetModules.Classes
             dlls.AddRange(Directory.GetFiles(path.LocalPath, "*.exe", SearchOption.AllDirectories));
 
             dlls = dlls.Where(d => Count(Path.DirectorySeparatorChar, d) <= startingDepth + directoryDepth).ToList();
-            var useable = dlls.SelectMany((dll) => GetUseableTypes(new Uri(dll), @type)).ToList();
+            var useable = dlls.SelectMany((dll) => GetUseableTypes(host, new Uri(dll), @type)).ToList();
             return useable;
         }
 
@@ -123,7 +123,7 @@ namespace NetModules.Classes
         /// <summary>
         /// 
         /// </summary>
-        private static IList<Type> GetUseableTypes(Uri assemblyPath, Type type)
+        private static IList<Type> GetUseableTypes(IModuleHost host, Uri assemblyPath, Type type)
         {
             var ret = new List<Type>();
 
@@ -146,7 +146,10 @@ namespace NetModules.Classes
 
                 loader.Unload();
             }
-            catch { }            
+            catch (Exception ex)
+            {
+                host.Log(Events.LoggingEvent.Severity.Error, "An error occured while attempting to load an assembly. The main cause of this is that the assembly is not a valid .NET assembly but may be the result of an underlying exception.", assemblyPath, ex);
+            }            
 
             return ret;
         }

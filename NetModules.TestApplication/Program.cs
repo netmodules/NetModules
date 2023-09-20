@@ -95,6 +95,26 @@ namespace NetModules.TestApplication
             {
                 // Waiting for user input...
                 var request = Console.ReadLine();
+
+                if (request.Equals("unload modules", StringComparison.OrdinalIgnoreCase))
+                {
+                    host.Modules.UnloadModules();
+                    continue;
+                }
+
+                if (request.Equals("load modules", StringComparison.OrdinalIgnoreCase))
+                {
+                    host.Modules.LoadModules();
+                    continue;
+                }
+
+                if (request.Equals("gc.collect()", StringComparison.OrdinalIgnoreCase))
+                {
+                    GC.Collect();
+                    continue;
+                }
+
+
                 var e = new ChatModuleEvent();
 
                 // We created a new chat event and added the input text to the IEvent.Input object.
@@ -111,7 +131,7 @@ namespace NetModules.TestApplication
                 }
                 else
                 {
-                    throw new Exception("Unable to handle the event.");
+                    Console.WriteLine("Unable to handle the event. No handling module loaded...");
                 }
 
                 // Testing to see if we can get the input and output from the IEvent object... 
@@ -124,6 +144,10 @@ namespace NetModules.TestApplication
                 {
                     // Yes, so write out the response to the console...
                     Console.WriteLine(e.Output.Response);
+                }
+                else
+                {
+                    Console.WriteLine("The event was not handled, unable to respond...");
                 }
                 
                 // More random and not required console writing.

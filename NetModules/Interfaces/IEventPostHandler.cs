@@ -30,14 +30,14 @@ namespace NetModules.Interfaces
     /// any of the IEvents properties at this point as <see cref="IEventPostHandler{E}.OnHandled(E)"/> may be invoked using
     /// multi-threading.
     /// </summary>
-    public interface IEventPostHandler<E> : IEventPostHandler
-        where E : IEvent
+    public interface IEventPostHandler<T> : IEventPostHandler
+        where T : IEvent
     {
         ///// <summary>
         ///// This should be invoked by IModuleHost after its implementing IEventHandler handles an IEvent.
         ///// </summary>
         ///// <param name="e"></param>
-        //void OnHandled(E e);
+        //void OnHandled(T e);
     }
 
     /// <summary>

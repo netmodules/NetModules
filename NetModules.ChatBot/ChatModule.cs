@@ -136,5 +136,25 @@ namespace NetModules.ChatBot
         {
             Console.WriteLine("...");
         }
+
+        public override void OnLoading()
+        {
+            Console.WriteLine($"{ModuleAttributes.Name} Loading...");
+        }
+
+        public override void OnLoaded()
+        {
+            Console.WriteLine($"{ModuleAttributes.Name} Loaded.");
+        }
+
+        public override void OnUnloading()
+        {
+            Console.WriteLine($"{ModuleAttributes.Name} Unloading...");
+        }
+
+        public override void OnUnloaded()
+        {
+            Console.WriteLine($"{ModuleAttributes.Name} Unloaded.");
+        }
     }
 }
