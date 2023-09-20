@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using NetModules.Events;
 using NetModules.Interfaces;
@@ -64,7 +65,16 @@ namespace NetModules.Classes
 
             foreach (var @event in events)
             {
-                Instantiated.Add(@event, TypeManager.InstantiateEvent(@event));
+                try
+                {
+                    Instantiated.Add(@event, TypeManager.InstantiateEvent(@event));
+                }
+                catch (Exception ex)
+                {
+                    Host.Log(LoggingEvent.Severity.Error
+                        , "An error occurred while attempting to import an event."
+                        , ex);
+                }
             }
 
             Imported = true;
@@ -90,12 +100,24 @@ namespace NetModules.Classes
         public IEvent GetSolidEventFromName(EventName name)
         {
             var instantiated = Instantiated.FirstOrDefault(i => i.Value.Name == name);
+            
             if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
-            return TypeManager.InstantiateEvent(instantiated.Key);
+            try
+            {
+                return TypeManager.InstantiateEvent(instantiated.Key);
+            }
+            catch (Exception ex)
+            {
+                Host.Log(LoggingEvent.Severity.Error
+                    , "An error occurred while attempting to instantiate an event."
+                    , ex);
+            }
+
+            return null;
         }
 
 
@@ -103,12 +125,24 @@ namespace NetModules.Classes
         public IEvent GetSolidEventFromType(Type type)
         {
             var instantiated = Instantiated.FirstOrDefault(i => i.Key == type);
+            
             if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
-            return TypeManager.InstantiateEvent(instantiated.Key);
+            try
+            {
+                return TypeManager.InstantiateEvent(instantiated.Key);
+            }
+            catch (Exception ex)
+            {
+                Host.Log(LoggingEvent.Severity.Error
+                    , "An error occurred while attempting to instantiate an event."
+                    , ex);
+            }
+
+            return null;
         }
 
 
@@ -116,12 +150,24 @@ namespace NetModules.Classes
         public IEvent GetSolidEventFromType<T, I, O>() where T : IEvent<I, O> where I : IEventInput where O : IEventOutput
         {
             var instantiated = Instantiated.FirstOrDefault(i => i.Key == typeof(T));
+            
             if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
-            return TypeManager.InstantiateEvent(instantiated.Key);
+            try
+            {
+                return TypeManager.InstantiateEvent(instantiated.Key);
+            }
+            catch (Exception ex)
+            {
+                Host.Log(LoggingEvent.Severity.Error
+                    , "An error occurred while attempting to instantiate an event."
+                    , ex);
+            }
+
+            return null;
         }
     }
 }

@@ -193,7 +193,6 @@ namespace NetModules.Classes
                         return assembly;
                     }
 
-
                     var current = AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic);
 
                     // It's possible that assemblyName can equal both the path to an assembly file location or the simple

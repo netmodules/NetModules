@@ -95,11 +95,22 @@ namespace NetModules.Classes
         /// <inheritdoc/>
         public void InitializeModule()
         {
-            LoadContext.Load(true);
-            var module = TypeManager.InstantiateModule(ModuleType, LoadContext);
-            module.ModuleAttributes = ModuleAttributes;
-            module.Host = Host;
-            Module = module;
+            try
+            {
+                LoadContext.Load(true);
+                var module = TypeManager.InstantiateModule(ModuleType, LoadContext);
+                module.ModuleAttributes = ModuleAttributes;
+                module.Host = Host;
+                Module = module;
+            }
+            catch (Exception ex)
+            {
+                Host.Log(LoggingEvent.Severity.Error
+                    , "An error occurred while attempting to initialize a module."
+                    , Path
+                    , ModuleType.FullName
+                    , ex);
+            }
         }
 
 

@@ -29,6 +29,7 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using NetModules.Interfaces;
+using NetModules.Events;
 
 namespace NetModules.Classes
 {
@@ -126,7 +127,8 @@ namespace NetModules.Classes
         private static IList<Type> GetUseableTypes(IModuleHost host, Uri assemblyPath, Type type)
         {
             var ret = new List<Type>();
-
+            var message = "Unable to iterate for types in assembly, the assembly was not loaded. The main cause of this is that the assembly is not a valid .NET assembly but may be the result of an underlying exception.";
+            
             // Wrapped try/catch for instances where a dll or exe file can not be loaded with .NET reflection, in this case we
             // would presume that the assembly being loaded is not a .NET assembly and therefore can not contain any useable
             // types.
@@ -135,6 +137,14 @@ namespace NetModules.Classes
                 var loader = new AssemblyLoader(assemblyPath);
                 var assembly = loader.Load();
 
+                if (assembly == null)
+                {
+                    host.Log(Events.LoggingEvent.Severity.Error
+                        , message
+                        , assemblyPath
+                        , type.FullName);
+                    return ret;
+                }
 
                 foreach (Type t in assembly.GetExportedTypes())
                 {
@@ -148,7 +158,11 @@ namespace NetModules.Classes
             }
             catch (Exception ex)
             {
-                host.Log(Events.LoggingEvent.Severity.Error, "An error occured while attempting to load an assembly. The main cause of this is that the assembly is not a valid .NET assembly but may be the result of an underlying exception.", assemblyPath, ex);
+                host.Log(Events.LoggingEvent.Severity.Error
+                    , message
+                    , assemblyPath
+                    , type.FullName
+                    , ex);
             }            
 
             return ret;
@@ -160,24 +174,32 @@ namespace NetModules.Classes
         /// </summary>
         public static Module InstantiateModule(Type module, AssemblyLoader loader)
         {
-            var type = typeof(Module);
-            loader.Load();
-
-            foreach (Type t in loader.GetTypes())
+            try
             {
-                if ((type == t || type.IsAssignableFrom(t)) && !t.IsAbstract && !t.IsInterface)
+                var type = typeof(Module);
+                loader.Load();
+
+                foreach (Type t in loader.GetTypes())
                 {
-                    if (t == module)
+                    if ((type == t || type.IsAssignableFrom(t)) && !t.IsAbstract && !t.IsInterface)
                     {
-                        var result = Activator.CreateInstance(t) as Module;
-                        if (result != null)
+                        if (t == module)
                         {
-                            return result;
+                            var result = Activator.CreateInstance(t) as Module;
+                            if (result != null)
+                            {
+                                return result;
+                            }
                         }
                     }
                 }
             }
-
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while attempting to instantiate a module."
+                    , ex);
+            }
+            
             return null;
         }
 
