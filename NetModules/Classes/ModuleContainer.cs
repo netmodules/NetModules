@@ -35,6 +35,8 @@ namespace NetModules.Classes
     [Serializable]
     public class ModuleContainer : IModuleContainer, IModule
     {
+        Exception InitializingException;
+
         /// <inheritdoc/>
         public IModuleHost Host { get; private set; }
 
@@ -105,6 +107,8 @@ namespace NetModules.Classes
             }
             catch (Exception ex)
             {
+                InitializingException = ex;
+                // TODO: Ensure that this error is reported correctly...
                 Host.Log(LoggingEvent.Severity.Error
                     , "An error occurred while attempting to initialize a module."
                     , Path
@@ -214,6 +218,11 @@ namespace NetModules.Classes
             if (Module != null)
             {
                 return Module.ModuleAttributes.Name;
+            }
+
+            if (InitializingException != null)
+            {
+                return InitializingException.ToString();
             }
 
             return base.ToString();

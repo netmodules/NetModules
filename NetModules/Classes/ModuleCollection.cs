@@ -220,9 +220,9 @@ namespace NetModules.Classes
             {
                 foreach (var c in loadFirst)
                 {
-                    if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                    if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                     {
-                        Host.Log(LoggingEvent.Severity.Error, "Failed to load module..."
+                        Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoading()..."
                             , c.ModuleAttributes);
                         continue;
                     }
@@ -241,8 +241,10 @@ namespace NetModules.Classes
 
                 foreach (var c in loadFirst)
                 {
-                    if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                    if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                     {
+                        Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoaded()..."
+                            , c.ModuleAttributes);
                         continue;
                     }
 
@@ -261,8 +263,10 @@ namespace NetModules.Classes
 
             foreach (var c in Containers)
             {
-                if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
+                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoading()..."
+                        , c.ModuleAttributes);
                     continue;
                 }
 
@@ -279,8 +283,10 @@ namespace NetModules.Classes
 
             foreach (var c in Containers)
             {
-                if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
+                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoaded()..."
+                        , c.ModuleAttributes);
                     continue;
                 }
 
@@ -297,8 +303,10 @@ namespace NetModules.Classes
 
             foreach (var c in Containers)
             {
-                if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
+                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnAllModulesLoaded()..."
+                        , c.ModuleAttributes);
                     continue;
                 }
 
