@@ -235,27 +235,10 @@ namespace NetModules.Classes
                         Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
                             , c.ModuleAttributes);
                         c.Module.OnLoading();
-                        
-                    }
-                }
-
-                foreach (var c in loadFirst)
-                {
-                    if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
-                    {
-                        Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoaded()..."
-                            , c.ModuleAttributes);
-                        continue;
-                    }
-
-                    // Finally we invoke OnLoaded on each module in the order that they should be loaded. This is decided
-                    // in the ImportModules method and when the imported modules are added to this collection.
-                    if (!c.Module.Loaded)
-                    {
+                        c.Module.Loaded = true;
                         c.Module.OnLoaded();
                         Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
                             , c.ModuleAttributes);
-                        c.Module.Loaded = true;
                     }
                 }
             }
@@ -278,26 +261,10 @@ namespace NetModules.Classes
                     Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
                             , c.ModuleAttributes);
                     c.Module.OnLoading();
-                }
-            }
-
-            foreach (var c in Containers)
-            {
-                if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
-                {
-                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoaded()..."
-                        , c.ModuleAttributes);
-                    continue;
-                }
-
-                // Finally we invoke OnLoaded on each module in the order that they should be loaded. This is decided
-                // in the ImportModules method and when the imported modules are added to this collection.
-                if (!c.Module.Loaded)
-                {
+                    c.Module.Loaded = true;
                     c.Module.OnLoaded();
                     Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
                             , c.ModuleAttributes);
-                    c.Module.Loaded = true;
                 }
             }
 
@@ -348,22 +315,10 @@ namespace NetModules.Classes
                     Host.Log(LoggingEvent.Severity.Debug, "Unloading module..."
                             , c.ModuleAttributes);
                     c.Module.OnUnloading();
-                }
-            }
-
-            foreach (var c in Containers)
-            {
-                if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
-                {
-                    continue;
-                }
-
-                if (c.Module != null && c.Module.Loaded)
-                {
+                    c.Module.Loaded = false;
                     c.Module.OnUnloaded();
                     Host.Log(LoggingEvent.Severity.Debug, "Unloaded module..."
                             , c.ModuleAttributes);
-                    c.Module.Loaded = false;
                 }
             }
 
@@ -504,6 +459,17 @@ namespace NetModules.Classes
             {
                 handler.OnHandled(e);   
             }
+        }
+
+
+        public IModuleContainer this[int index]
+        {
+            get => Containers[index];
+        }
+
+        public IModuleContainer this[ModuleName key]
+        {
+            get => Containers.Where(x => x.ModuleAttributes.Name == key).FirstOrDefault();
         }
     }
 }
