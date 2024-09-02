@@ -24,8 +24,6 @@
  */
 
 using System;
-using System.Text;
-using System.Collections.Generic;
 using NetModules.Interfaces;
 
 namespace NetModules
@@ -46,7 +44,8 @@ namespace NetModules
         /// <summary>
         /// While the Handled property of an instance of IEvent has a getter and a setter, UnhandledEvent will
         /// ignore the setter and will always return false for the Handled property. This is by design so that
-        /// an UnhandledEvent will always continue any Module that is registered to handle it.
+        /// an UnhandledEvent will always continue with propagation to any Module that is registered to handle
+        /// it.
         /// </summary>
         public override bool Handled { get { return false; } set { } }
     }

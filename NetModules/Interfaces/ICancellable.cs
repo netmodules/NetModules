@@ -23,25 +23,27 @@
     THE SOFTWARE.
  */
 
-using System;
-using NetModules.Interfaces;
+using System.Threading;
 
-namespace NetModules.Events
+namespace NetModules.Interfaces
 {
     /// <summary>
-    /// This is the <see cref="IEventInput"/> type for a <see cref="GetSettingEvent"/>
+    /// A basic interface that allows a <see cref="System.Threading.CancellationToken"/> to be set, allowing the <see cref="System.Threading.CancellationToken"/>
+    /// to be monitored by a thread, task, or process. This interface is implemented in <see cref="CancellableEvent{I, O}"/>.
     /// </summary>
-    [Serializable]
-    public struct GetSettingEventInput : IEventInput
+    public interface ICancellable
     {
         /// <summary>
-        /// The name of the module to fetch a setting for.
+        /// The <see cref="System.Threading.CancellationToken"/> that can be monitored for cancellation notification requests
+        /// from within your <see cref="CancellableEvent{I, O}"/> handler. This interface is implemented in <see cref="CancellableEvent{I, O}"/>.
         /// </summary>
-        public ModuleName ModuleName { get; set; }
+        CancellationToken CancellationToken { get;}
 
         /// <summary>
-        /// The name of the setting to fetch.
+        /// Allows you to set a <see cref="System.Threading.CancellationToken"/> to be monitored for cancellation notification requests.
+        /// Keep in mind that a CancellationToken is entirely cooperative and if not monitored for cancellation within a method will do
+        /// nothing.
         /// </summary>
-        public string SettingName { get; set; }
+        void SetCancelToken(CancellationToken cancellationToken);
     }
 }

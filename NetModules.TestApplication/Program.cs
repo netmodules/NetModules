@@ -24,8 +24,8 @@
  */
 
 using System;
-using NetModules.ChatBot.Events;
 using NetModules.Interfaces;
+using NetModules.ChatBot.Events;
 
 namespace NetModules.TestApplication
 {

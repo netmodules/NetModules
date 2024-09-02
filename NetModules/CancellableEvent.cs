@@ -24,24 +24,27 @@
  */
 
 using System;
+using System.Threading;
 using NetModules.Interfaces;
 
-namespace NetModules.Events
+namespace NetModules
 {
     /// <summary>
-    /// This is the <see cref="IEventInput"/> type for a <see cref="GetSettingEvent"/>
+    /// This abstract event is built in to the NetModules core library and requires inheriting. This class
+    /// is a wrapper for <see cref="Event{I, O}"/> that exposes an additional option to set a <see cref="System.Threading.CancellationToken"/>
+    /// that can be monitored for cancellation notification requests. This class can be used to speed up implementation
+    /// when using NetModule's default architecture.
     /// </summary>
     [Serializable]
-    public struct GetSettingEventInput : IEventInput
+    public abstract class CancellableEvent<I, O> : Event<I, O>, ICancellable where I : IEventInput where O : IEventOutput
     {
-        /// <summary>
-        /// The name of the module to fetch a setting for.
-        /// </summary>
-        public ModuleName ModuleName { get; set; }
+        /// <inheritdoc/>
+        public CancellationToken CancellationToken { get; private set; }
 
-        /// <summary>
-        /// The name of the setting to fetch.
-        /// </summary>
-        public string SettingName { get; set; }
+        /// <inheritdoc/>
+        public void SetCancelToken(CancellationToken cancellationToken)
+        {
+            CancellationToken = cancellationToken;
+        }
     }
 }

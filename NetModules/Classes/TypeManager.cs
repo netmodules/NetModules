@@ -29,7 +29,6 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using NetModules.Interfaces;
-using NetModules.Events;
 
 namespace NetModules.Classes
 {

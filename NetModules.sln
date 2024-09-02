@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetModules.ChatBot.Events",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetModules.TestApplication", "NetModules.TestApplication\NetModules.TestApplication.csproj", "{D3A21DE9-A4C4-47B6-85E7-6D2563D151DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetModules.TestCancellableEvent", "NetModules.TestCancellableEvent\NetModules.TestCancellableEvent.csproj", "{A23BBE82-3A24-4904-9486-492BD3FBDD77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D3A21DE9-A4C4-47B6-85E7-6D2563D151DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A21DE9-A4C4-47B6-85E7-6D2563D151DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A21DE9-A4C4-47B6-85E7-6D2563D151DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A23BBE82-3A24-4904-9486-492BD3FBDD77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A23BBE82-3A24-4904-9486-492BD3FBDD77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A23BBE82-3A24-4904-9486-492BD3FBDD77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A23BBE82-3A24-4904-9486-492BD3FBDD77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

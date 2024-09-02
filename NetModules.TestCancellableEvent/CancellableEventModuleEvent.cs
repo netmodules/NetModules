@@ -23,25 +23,19 @@
     THE SOFTWARE.
  */
 
-using System;
+using NetModules.Events;
 using NetModules.Interfaces;
 
-namespace NetModules.Events
+namespace NetModules.TestCancellableEvent
 {
-    /// <summary>
-    /// This is the <see cref="IEventInput"/> type for a <see cref="GetSettingEvent"/>
-    /// </summary>
     [Serializable]
-    public struct GetSettingEventInput : IEventInput
+    public class CancellableEventModuleEvent : CancellableEvent<EmptyEventInput, EmptyEventOutput>
     {
         /// <summary>
-        /// The name of the module to fetch a setting for.
+        /// Each <see cref="IEvent"/> that is loaded into <see cref="ModuleHost"/> should have a unique
+        /// <see cref="EventName"/> that can be used to identify the event type where the concrete type of the
+        /// <see cref="IEvent"/> object is unknown.
         /// </summary>
-        public ModuleName ModuleName { get; set; }
-
-        /// <summary>
-        /// The name of the setting to fetch.
-        /// </summary>
-        public string SettingName { get; set; }
+        public override EventName Name { get; } = "NetModules.CancellableEvent";
     }
 }

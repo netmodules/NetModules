@@ -23,25 +23,41 @@
     THE SOFTWARE.
  */
 
-using System;
+using NetModules;
 using NetModules.Interfaces;
+using NetModules.TestCancellableEvent;
 
-namespace NetModules.Events
+
+// Create a new module host
+var host = new BasicModuleHost();
+
+// Invoking ModuleHost.Modules.GetModuleNames method tells us what modules have been imported. We
+// are calling this method for information only. Modules have not been loaded yet.
+var names = host.Modules.GetModuleNames();
+
+// Now we load modules. Modules must be loaded otherwise they can not handle events.
+host.Modules.LoadModules();
+
+// Importing module happens by default when the default ModuleHost is initialized but you can call
+// ImportModules any time and any newly added modules will be loaded.
+host.Modules.ImportModules();
+
+var modulesList = host.Modules.GetModulesByType<IModule>();
+var cancellableEventModuleModule = host.Modules.GetModulesByType<CancellableEventModule>()[0];
+
+var cancellationSource = new CancellationTokenSource();
+cancellationSource.CancelAfter(5000);
+
+var @event = new CancellableEventModuleEvent();
+@event.SetCancelToken(cancellationSource.Token);
+
+host.Handle(@event);
+
+while(!@event.HasMeta("message"))
 {
-    /// <summary>
-    /// This is the <see cref="IEventInput"/> type for a <see cref="GetSettingEvent"/>
-    /// </summary>
-    [Serializable]
-    public struct GetSettingEventInput : IEventInput
-    {
-        /// <summary>
-        /// The name of the module to fetch a setting for.
-        /// </summary>
-        public ModuleName ModuleName { get; set; }
 
-        /// <summary>
-        /// The name of the setting to fetch.
-        /// </summary>
-        public string SettingName { get; set; }
-    }
 }
+
+Console.WriteLine(@event.GetMetaValue("message", "The event was processed with no output message."));
+Console.WriteLine("Press any key to exit...");
+Console.ReadKey();

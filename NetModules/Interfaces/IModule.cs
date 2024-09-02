@@ -23,9 +23,8 @@
     THE SOFTWARE.
  */
 
-using NetModules.Events;
 using System;
-using System.Collections.Generic;
+using NetModules.Events;
 
 namespace NetModules.Interfaces
 {
