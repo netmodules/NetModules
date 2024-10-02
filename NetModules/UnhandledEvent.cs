@@ -35,7 +35,7 @@ namespace NetModules
     /// design so that an UnhandledEvent will always continue any Module that is assigned to handle it.
     /// </summary>
     [Serializable]
-    public abstract class UnhandledEvent<I, O> : Event<I, O> where I : IEventInput where O : IEventOutput
+    public abstract class UnhandledEvent<I, O> : Event<I, O>, IUnhandledEvent where I : IEventInput where O : IEventOutput
     {
         /// <inheritdoc/>
         public override EventName Name { get; }
