@@ -53,6 +53,12 @@ namespace NetModules.Interfaces
 
 
         /// <summary>
+        /// Load a specific module by its ModuleName.
+        /// </summary>
+        /// <param name="module"></param>
+        void LoadModule(ModuleName module);
+
+        /// <summary>
         /// This should invoke the OnLoad() method on each imported module followed the OnLoaded() method on each module. This allows for things like module
         /// dependency checking, initialization, threaded loops etc... This should enable the Handle() event for each loaded module. If modules is null, all
         /// imported modules should be loaded.
@@ -60,6 +66,11 @@ namespace NetModules.Interfaces
         /// <param name="modules"></param>
         void LoadModules(IList<ModuleName> modules = null);
 
+        /// <summary>
+        /// Unload a specific module by its ModuleName.
+        /// </summary>
+        /// <param name="module"></param>
+        void UnloadModule(ModuleName module);
 
         /// <summary>
         /// If implemented, this method should disable/unload the loaded modules.

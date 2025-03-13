@@ -86,6 +86,14 @@ namespace NetModules
 
 
         /// <summary>
+        /// This property tells ModuleHost and ModuleCollection whether or not to load this module if no collection of <see cref="ModuleName"/>
+        /// is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. It allows you to conditionally load
+        /// a module mannually. If the property is false, you must pass this module's name to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. Defaults to true.
+        /// </summary>
+        public bool LoadModule { get; set; } = true;
+
+
+        /// <summary>
         /// This allows the instance of IModule to inform IModuleHost of the priority that it should be loaded.
         /// A lower value for this property will tell IModuleHost that this IModule wants to load before other
         /// modules. Defaults to zero.
@@ -97,7 +105,8 @@ namespace NetModules
         /// This property tells the ModuleHost to fully load the instance of IModule before loading other modules.
         /// This will work alongside LoadPriority but should be considered as loading of primary and secondary modules
         /// where an IModule instance with LoadFirst set to true will invoke both OnLoading() and Onloaded() before
-        /// other module instances. Defaults to false.
+        /// other module instances. If <see cref="LoadModule"/> is false, this module will only load first as part of
+        /// the collection of <see cref="ModuleName"/> that is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. Defaults to false.
         /// </summary>
         public bool LoadFirst { get; set; }
 

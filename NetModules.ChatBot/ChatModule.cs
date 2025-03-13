@@ -30,7 +30,7 @@ using NetModules.ChatBot.Events;
 namespace NetModules.ChatBot
 {
     [Serializable]
-    [Module(LoadFirst = true, Description = "This is a basic example chat module. All Types implementing Module or IModule should be decorated with a ModuleAttribute.",
+    [Module(LoadModule = false, LoadFirst = true, Description = "This is a basic example chat module. All Types implementing Module or IModule should be decorated with a ModuleAttribute.",
         AdditionalInformation = new string[] { "AdditionalInformation could be used to hold further information such as usage instruction or documentation reference." },
         Dependencies = new string[] { "NetModules.ChatBot.ChatModule" /* This module has a "self dependency" for testing purposes. */ }
         )]

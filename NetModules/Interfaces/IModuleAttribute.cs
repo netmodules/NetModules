@@ -67,6 +67,14 @@ namespace NetModules.Interfaces
         /// </summary>
         short HandlePriority { get; }
 
+
+        /// <summary>
+        /// This property informs ModuleHost and ModuleCollection whether or not to load this module as a default module.
+        /// It allows you have the option to conditionally load a module mannually.
+        /// </summary>
+        bool LoadModule { get; }
+
+
         /// <summary>
         /// This allows the instance of IModule to inform IModuleHost of the priority that it should be loaded.
         /// </summary>
@@ -76,7 +84,7 @@ namespace NetModules.Interfaces
         /// <summary>
         /// This property tells the ModuleHost to fully load the instance of IModule before loading other modules.
         /// This will work alongside LoadPriority but should be considered as loading of primary and secondary modules
-        /// where an IModule instance with LoadFirst set to true would trigger both OnLoading() and Onloaded() before
+        /// where an IModule instance with LoadFirst set to true will invoke both OnLoading() and Onloaded() before
         /// other module instances.
         /// </summary>
         bool LoadFirst { get; }

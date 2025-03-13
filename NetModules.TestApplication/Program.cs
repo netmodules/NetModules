@@ -26,6 +26,8 @@
 using System;
 using NetModules.Interfaces;
 using NetModules.ChatBot.Events;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NetModules.TestApplication
 {
@@ -66,6 +68,11 @@ namespace NetModules.TestApplication
             host.Modules.ImportModules();
 
             var modulesList = host.Modules.GetModulesByType<IModule>();
+
+            if (modulesList.Count == 0)
+            {
+                host.Modules.LoadModule(names.First());
+            }
 
             var chatBotModule = host.Modules.GetModulesByType<ChatBot.ChatModule>()[0];
 

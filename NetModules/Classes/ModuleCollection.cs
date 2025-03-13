@@ -95,7 +95,7 @@ namespace NetModules.Classes
         /// </summary>
         public virtual IList<IModule> GetModulesByType<T>() where T : IModule
         {
-            return Containers.Where(c => typeof(T).IsAssignableFrom(c.ModuleType)).Select(c => c.Module as IModule).ToList();
+            return Containers.Where(c => c.Module != null && typeof(T).IsAssignableFrom(c.ModuleType)).Select(c => c.Module as IModule).ToList();
         }
 
 
@@ -162,6 +162,22 @@ namespace NetModules.Classes
         }
 
 
+
+        /// <summary>
+        /// Allows you to load a module by its <see cref="ModuleName"/>. See <see cref="LoadModules(IList{ModuleName})"/> for more details.
+        /// </summary>
+        /// <param name="module"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public virtual void LoadModule(ModuleName module)
+        {
+            if (module == default(ModuleName))
+            {
+                throw new ArgumentException("module");
+            }
+
+            LoadModules(new List<ModuleName>() { module });
+        }
+
         /// <summary>
         /// This method must be invoked to load modules ready for handling instances of <see cref="IEvent"/>. This allows the module or
         /// modules being loaded to initialize internally. Passing a list of <see cref="ModuleName"/> as an argument to this method will
@@ -198,6 +214,10 @@ namespace NetModules.Classes
             foreach (var c in Containers)
             {
                 if (modules != null && !modules.Contains(c.ModuleAttributes.Name))
+                {
+                    continue;
+                }
+                else if (modules == null && !c.ModuleAttributes.LoadModule)
                 {
                     continue;
                 }
@@ -245,6 +265,13 @@ namespace NetModules.Classes
 
             foreach (var c in Containers)
             {
+                // If the module is a LoadFirst module, loading should have already occured for this module
+                // in the loop above so skip it!
+                if (c.ModuleAttributes.LoadFirst)
+                {
+                    continue;
+                }
+
                 if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
                     Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoading()..."
@@ -285,6 +312,22 @@ namespace NetModules.Classes
                             , c.ModuleAttributes);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Allows you to unload a module by its <see cref="ModuleName"/>. See <see cref="UnloadModules(IList{ModuleName})"/> for more details.
+        /// </summary>
+        /// <param name="module"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public virtual void UnloadModule(ModuleName module)
+        {
+            if (module == default(ModuleName))
+            {
+                throw new ArgumentException("module");
+            }
+
+            UnloadModules(new List<ModuleName>() { module });
         }
 
 
