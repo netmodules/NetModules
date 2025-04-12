@@ -72,7 +72,7 @@ namespace NetModules.Interfaces
         /// This property informs ModuleHost and ModuleCollection whether or not to load this module as a default module.
         /// It allows you have the option to conditionally load a module mannually.
         /// </summary>
-        bool LoadModule { get; }
+        bool AutoLoad { get; }
 
 
         /// <summary>

@@ -29,14 +29,15 @@ using NetModules.Interfaces;
 namespace NetModules
 {
     /// <summary>
-    /// Any module deriving from <see cref="Module"/> base should be decorated with ModuleAttribute before it can be loaded by
-    /// <see cref="ModuleHost"/> using the default NetModules architecture.
+    /// Any module deriving from <see cref="Module"/> base should be decorated with ModuleAttribute before it can
+    /// be loaded by <see cref="ModuleHost"/> using the default NetModules architecture.
     /// </summary>
     [Serializable, AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class ModuleAttribute : Attribute, IModuleAttribute
     {
         /// <summary>
-        /// This is used along with the Name property to create a unique ID that can be used while loading and for identifying modules.
+        /// This is used along with the Name property to create a unique ID that can be used while loading and for
+        /// identifying modules interally.
         /// </summary>
         readonly string Unique = Guid.NewGuid().ToString();
 
@@ -80,23 +81,25 @@ namespace NetModules
         /// This allows the instance of IModule to inform IModuleHost of the priority that it would like to handle
         /// IEvents. It means that if 2 or more instances of IModule handle the same type that implements IEvent,
         /// you can control which IModule handles the IEvent first. A lower value for this property will tell
-        /// IModuleHost that this IModule wants to handle the IEvent first. Defaults to zero.
+        /// IModuleHost that this IModule wants to handle the IEvent first. Defaults to zero (0).
         /// </summary>
         public short HandlePriority { get; set; }
 
 
         /// <summary>
-        /// This property tells ModuleHost and ModuleCollection whether or not to load this module if no collection of <see cref="ModuleName"/>
-        /// is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. It allows you to conditionally load
-        /// a module mannually. If the property is false, you must pass this module's name to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. Defaults to true.
+        /// This property tells ModuleHost and ModuleCollection whether or not to load this module if no collection
+        /// of <see cref="ModuleName"/> is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>.
+        /// It allows you to enforce conditionally loading a module mannually. If the property is false, you must pass
+        /// this module's name to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>.
+        /// Defaults to true.
         /// </summary>
-        public bool LoadModule { get; set; } = true;
+        public bool AutoLoad { get; set; } = true;
 
 
         /// <summary>
         /// This allows the instance of IModule to inform IModuleHost of the priority that it should be loaded.
         /// A lower value for this property will tell IModuleHost that this IModule wants to load before other
-        /// modules. Defaults to zero.
+        /// modules. Defaults to zero (0).
         /// </summary>
         public short LoadPriority { get; set; }
 
@@ -105,8 +108,9 @@ namespace NetModules
         /// This property tells the ModuleHost to fully load the instance of IModule before loading other modules.
         /// This will work alongside LoadPriority but should be considered as loading of primary and secondary modules
         /// where an IModule instance with LoadFirst set to true will invoke both OnLoading() and Onloaded() before
-        /// other module instances. If <see cref="LoadModule"/> is false, this module will only load first as part of
-        /// the collection of <see cref="ModuleName"/> that is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>. Defaults to false.
+        /// other module instances. If <see cref="AutoLoad"/> is false, this module will only load first as part of
+        /// the collection of <see cref="ModuleName"/> that is given to <see cref="IModuleCollection.LoadModules(System.Collections.Generic.IList{ModuleName})"/>.
+        /// Defaults to false.
         /// </summary>
         public bool LoadFirst { get; set; }
 

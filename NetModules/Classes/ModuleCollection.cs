@@ -217,7 +217,7 @@ namespace NetModules.Classes
                 {
                     continue;
                 }
-                else if (modules == null && !c.ModuleAttributes.LoadModule)
+                else if (modules == null && !c.ModuleAttributes.AutoLoad)
                 {
                     continue;
                 }
