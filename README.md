@@ -33,6 +33,92 @@ A Module may trigger an Event requesting certain data. This Module does **not** 
 
 ## Getting Started
 
+### Installation
+
+To use NetModules in your project, simply add the library via NuGet Package Manager:
+```bash
+Install-Package NetModules
+````
+
+### Quick Examples
+
+Here's a basic demonstration of how to use NetModules:
+
+### Declaring an Event
+This example demonstrates an event class inheriting from the Event<I, O> structure.
+```csharp
+public class ExampleEventInput : IEventInput {}
+
+public class ExampleEventOutput : IEventOutput {}
+
+public class ExampleEvent : Event<ExampleEventInput, ExampleEventOutput>
+{
+    /// <summary>
+    /// Your event name should be as unique as possible, as this can be used to identify and instantiate events via ModuleHost where required.
+    /// Think of how Android Package naming works. E.g. "com.yourdomain.yourpackagename"
+    /// </summary>
+    public override EventName Name { get; } = "NetModules.GitHub.ExampleEvent";
+}
+```
+
+### Handling an Event with a Module
+A basic example module that handles the above Event.
+```csharp
+using NetModules.Events;
+using NetModules.Interfaces;
+
+
+[Module(Description = "A basic module for demonstration purposes.")]
+public class ExampleModule : Module
+{
+	public override bool CanHandle(IEvent e)
+	{
+		return e is ExampleEvent;
+	}
+
+	public override void Handle(IEvent e)
+	{
+		if (e is ExampleEvent example)
+		{
+			// Do something with the your custom event Input and set any custom event Output where required.
+			example.Handled = true;
+		}
+	}
+}
+```
+
+### Creating and Loading a Module Host
+A ModuleHost is required to manage and dispatch events to loaded modules.
+```csharp
+using NetModules;
+
+class BasicModuleHost : ModuleHost
+{
+}
+
+// Create a new module host
+ModuleHost host = new BasicModuleHost();
+
+// Load available modules
+host.Modules.LoadModules();
+```
+
+### Dispatching an Event
+Once the ModuleHost has been initialized, events can be dispatched for handling.
+```csharp
+using NetModules;
+
+// Create a new chat event
+var exampleEvent = new ExampleEvent
+{
+    Input = new ExampleEventInput()
+};
+
+host.Handle(exampleEvent);
+```
+Every Module that is loaded into a loaded a ModuleHost has access to the ModuleHost via the `this.Host` property. This means that any Module can dispatch any Event through `this.Host.Handle` and the event will be sent to another handling Module for processing.
+
+### Additional Examples & Advanced Usage
 Explore the [NetModules.ChatModule](https://github.com/netmodules/netmodules/tree/master/NetModules.ChatBot), which showcases the framework's modular approach through a chatbot implementation. The example demonstrates Event handling using the [NetModules.ChatModule.Events.ChatModuleEvent](https://github.com/netmodules/netmodules/tree/master/NetModules.ChatBot.Events) and the [IEvent](https://github.com/netmodules/netmodules/blob/master/netmodules/Interfaces/IEvent.cs) interface.
 
 There are other examples in the repository, including a simle Console logging Module [(BasicConsoleLoggingModule)](https://github.com/netmodules/netmodules/blob/main/NetModules.BasicConsoleLogging/BasicConsoleLoggingModule.cs) that handles the internal [LoggingEvent](https://github.com/netmodules/netmodules/blob/main/NetModules/Events/LoggingEvent.cs) and outputs to Console, and a basic Module that demonstrates how to work with the [CancellableEvent](https://github.com/netmodules/netmodules/blob/main/NetModules/CancellableEvent.cs).
