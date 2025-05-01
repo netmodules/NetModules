@@ -1,52 +1,53 @@
-# NetModules #
+# NetModules: A Scalable, Abstract Event-Driven Modular Framework
 
-In a one-liner, the aim of the NetModules project is to make developing customizable applications as simple as possible with all the hard work done by the NetModules architecture.
+NetModules is an open-source architecture designed for constructing scalable, abstract, event-driven modular systems. Initially conceived as a basic demonstration of the Managed Extensibility Framework (MEF), it has since evolved beyond MEF to provide a robust and flexible architecture for developing cross-platform, plugin-based applications.
 
-This project is open source so please feel free to contribute suggestions, make modifications and pull requests back to the repository.
-___
+## Why NetModules?
 
-### What and why is NetModules? ###
+Modern applications demand adaptability and modularity, and NetModules delivers precisely that by enforcing a strict event-handling paradigm. It allows developers to design highly scalable systems where:
 
-NetModules is an [MIT license](https://tldrlegal.com/license/mit-license) .NET 6 C# Class Library that offers an open-source system for creating [event-driven](https://en.wikipedia.org/wiki/Event-driven_architecture), modular and [plugin-based](https://en.wikipedia.org/wiki/Plug-in_(computing)) applications. 
+- **Event**: Strictly adhere to a predefined interface.
+- **Module**: Declare the capability to handle specific Event types.
+- **ModuleHost**: Serves as intermediary, ensuring efficient communication and delegation of event-handling responsibilities.
 
-This project was started as a simple example project that demonstrated an implementation of [Managed Extensibility Framework (MEF)](https://msdn.microsoft.com/en-us/magazine/ee291628.aspx). A framework included in Microsoft .NET Framework 4.0 and is also available as an external component at [codeplex](https://mef.codeplex.com/) for older versions of .NET Framework.
+### Deferred Responsibility & Scalability
 
-It was to demonstrate the architecture and benifits of a strict modular design pattern for developing complex applications.
+This architecture simplifies application scaling and future-proofing—modifications only require changes within the event-handling modules rather than a complete system overhaul.
 
-Although the project was initially built with MEF, not many features of MEF were used. MEF was mostly used to load each module at runtime and inject the IModuleHost into the Host property of each Module. Since porting the project to .NET Core, and later to .NET 6, removing MEF references in favor of Reflection was required due to lack of support. (THIS PROJECT NO LONGER DEPENDS ON MICROSOFT EXTENSIBILITY FRAMEWORK).
+#### Example: Logging System Upgrade
 
-The project has since grown into an advanced framework designed to simplify the development of cross-platform applications using a modular or plugin-based design pattern. It is compatible with .NET 6 and platforms that support .NET 6 class libraries. I have used this framework and the modular design pattern in many commercial projects and have always found that the architecture very welcomed by both clients and other developers I've worked on projects with.
+Imagine your application currently logs data to a local file system. To migrate to an external logging service, instead of modifying every Module that logs data, you simply build or update a dedicated logging **Module**. Existing modules continue logging events as usual, unaware of the underlying change.
 
-* NetModules is a simple, clean and compact .NET 6 class library for creating plugin-based, modular and customizable layered applications.
-___
+This follows the principle of **deferred responsibility** a Module raises an Event requesting data or a function call, but it does not need to handle the request itself or understand how it is processed. Instead, another Module, designed to handle that Event type, receives and processes the request, ensuring flexibility and separation of concerns.
 
-### How do I get set up? ###
+#### Example: Data Requests Between Modules
 
-Take a look at the [NetModules.ChatModule](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.ChatBot) project in the source code. The ChatModule demonstrates the implementation of a Module in the form of a 1980s style chatbot. This module demonstrates how to handle a [NetModules.ChatModule.Events.ChatModuleEvent](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.ChatBot.Events) and the event demonstrates how to implement the [IEvent](https://github.com/johnearnshaw/NetModules/blob/master/NetModules/Interfaces/IEvent.cs) interface.
+A Module may trigger an Event requesting certain data. This Module does **not** need to know where the data comes from or how it is processed—its only concern is receiving the required response. Another Module is responsible for handling the request and determining how and where the data is fetched or computed.
 
-The [NetModules.ChatModule](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.ChatBot) and [NetModules.ChatModule.Events](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.ChatBot.Events) class libraries are referenced in the demo project located at [NetModules.TestApplication](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.TestApplication), that is a console application. If you run this application without any modification, and provided you have the .NET 6 SDK runtime libraries installed, a console window will be displayed in that you can chat with the ChatBot module by entering text and pressing the return key.
+## Key Features
 
-The NetModules.TestApplication contains a [BasicModuleHost](https://github.com/johnearnshaw/NetModules/tree/master/NetModules.TestApplication/Classes) class that inherits from [NetModules.ModuleHost](https://github.com/johnearnshaw/NetModules/blob/master/NetModules/ModuleHost.cs). This class implements the [NetModules.Interfaces.IModuleHost](https://github.com/johnearnshaw/NetModules/blob/master/NetModules/Interfaces/IModuleHost.cs) interface. The ModuleHost class and implemented interfaces are used for loading modules and invoking the handling of events. There are no other dependency requirements in this project to keep it as simple as possible.
+- **Abstract Event Handling**: Events conform to an interface, ensuring consistency and interoperability.
+- **Modular Design**: Modules register their event-handling capabilities dynamically.
+- **Scalability & Future Development**: Easily replace or modify event-handling modules without affecting the broader system.
+- **Cross-Platform Compatibility**: Designed to function across any .NET-supported platform.
 
-The layout of the projects within the NetModules directory and solution is to demonstrate the design pattern of keeping modules and corresponding events is seperate class libraries, and referencing the module class libraries from within an application that depends on them, and the events class libraries can be referenced by modules that may depend on an event.
-  
-The core project and examples are fairly well documented and if you get stuck or have any questions, please contact me and I'll be glad to help out.
+## Getting Started
 
-For further documentation please see the [repository wiki](https://github.com/johnearnshaw/NetModules/wiki). Coming soon...
-___
+Explore the [NetModules.ChatModule](https://github.com/netmodules/netmodules/tree/master/NetModules.ChatBot), which showcases the framework's modular approach through a chatbot implementation. The example demonstrates Event handling using the [NetModules.ChatModule.Events.ChatModuleEvent](https://github.com/netmodules/netmodules/tree/master/NetModules.ChatBot.Events) and the [IEvent](https://github.com/netmodules/netmodules/blob/master/netmodules/Interfaces/IEvent.cs) interface.
 
-### Contribution guidelines ###
+There are other examples in the repository, including a simle Console logging Module [(BasicConsoleLoggingModule)](https://github.com/netmodules/netmodules/blob/main/NetModules.BasicConsoleLogging/BasicConsoleLoggingModule.cs) that handles the internal [LoggingEvent](https://github.com/netmodules/netmodules/blob/main/NetModules/Events/LoggingEvent.cs) and outputs to Console, and a basic Module that demonstrates how to work with the [CancellableEvent](https://github.com/netmodules/netmodules/blob/main/NetModules/CancellableEvent.cs).
 
-* Fork [NetModules](https://github.com/johnearnshaw/NetModules), make some changes, make a pull request. Simple!
-* Code will be reviewed when a pull request is made.
-___
+For more detailed guidance and examples, visit our [repository wiki](https://github.com/netmodules/netmodules/wiki) or our [website](https://netmodules.net/) (coming soon).
 
-### Who do I talk to? ###
+## Contributing
 
-* NetModules repo owner via message or the [issues board](https://github.com/johnearnshaw/NetModules/issues).
-___
+We welcome contributions! To get involved:
+1. Fork [NetModules](https://github.com/netmodules/NetModules), make improvements, and submit a pull request.
+2. Code will be reviewed upon submission.
+3. Join discussions via the [issues board](https://github.com/netmodules/netmodules/issues).
 
-### License ###
+## License
 
-* [The MIT License (MIT)](https://tldrlegal.com/license/mit-license) - You are free to use NetModules in personal and commercial projects, and modify/redistribute the source code provided the copyright notice is not removed.
-* If you use NetModules in your own project I would love to hear about it, so drop me a line (and even a credit to NetModules in your project if you feel generous). I would be very happy to hear about your experiences using the NetModules class library and framework in your projects, and any suggestions you may have for me to make it better.
+NetModules is licensed under the [MIT License](https://tldrlegal.com/license/mit-license), allowing unrestricted use, modification, and distribution. If you use NetModules in your own project, we’d love to hear about your experience, and even featur you on our website!
+
+[NetModules Foundation](https://netmodules.net/)
