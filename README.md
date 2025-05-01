@@ -125,6 +125,9 @@ There are other examples in the repository, including a simle Console logging Mo
 
 For more detailed guidance and examples, visit our [repository wiki](https://github.com/netmodules/netmodules/wiki) or our [website](https://netmodules.net/) (coming soon).
 
+Full documentation coming soon!
+
+
 ## Contributing
 
 We welcome contributions! To get involved:
@@ -134,6 +137,6 @@ We welcome contributions! To get involved:
 
 ## License
 
-NetModules is licensed under the [MIT License](https://tldrlegal.com/license/mit-license), allowing unrestricted use, modification, and distribution. If you use NetModules in your own project, we’d love to hear about your experience, and even featur you on our website!
+NetModules is licensed under the [MIT License](https://tldrlegal.com/license/mit-license), allowing unrestricted use, modification, and distribution. If you use NetModules in your own project, we’d love to hear about your experience, and possibly feature you on our website!
 
 [NetModules Foundation](https://netmodules.net/)

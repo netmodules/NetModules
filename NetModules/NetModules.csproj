@@ -4,16 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>John Earnshaw</Authors>
-    <RepositoryUrl>https://github.com/netmodules/NetModules</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>
 	<Company>NetModules Foundation</Company>
     <Copyright>NetModules Foundation</Copyright>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>event driven plugins plugin modules module modular framework scalable scaleable abstract architecture</PackageTags>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>A .NET 6 open-source framework for constructing future-proof-scalable abstract event-driven modular systems. Originally started as a simple project to demonstrate a basic implementation of Microsoft's .NET Managed Extensibility Framework (MEF). It has since evolved beyond MEF, into an advanced framework designed to simplify building cross-platform, event-driven, plugin-based, scalable, and modular applications using .NET and platforms that support .NET 6 class libraries.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+	<RepositoryType>Git</RepositoryType>
+	<RepositoryUrl>https://github.com/netmodules/NetModules</RepositoryUrl>
+	<PackageTags>event driven plugins plugin modules module modular framework scalable scaleable abstract architecture</PackageTags>
+	<Description>A .NET 6 open-source framework for constructing future-proof-scalable abstract event-driven modular systems. Originally started as a simple project to demonstrate a basic implementation of Microsoft's .NET Managed Extensibility Framework (MEF). It has since evolved beyond MEF, into an advanced framework designed to simplify building cross-platform, event-driven, plugin-based, scalable, and modular applications using .NET and platforms that support .NET 6 class libraries.</Description>
     <Version>1.3.6</Version>
   </PropertyGroup>
 
@@ -28,4 +28,5 @@
   <ItemGroup>
 	<None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
+	
 </Project>
