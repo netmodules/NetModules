@@ -34,9 +34,7 @@ namespace NetModules.TestCancellableEvent
     public class CancellableEventModuleEvent : CancellableEvent<EmptyEventInput, EmptyEventOutput>
     {
         /// <summary>
-        /// Each <see cref="IEvent"/> that is loaded into <see cref="ModuleHost"/> should have a unique
-        /// <see cref="EventName"/> that can be used to identify the event type where the concrete type of the
-        /// <see cref="IEvent"/> object is unknown.
+        /// <inheritdoc/>
         /// </summary>
         public override EventName Name { get; } = "NetModules.CancellableEvent";
     }
