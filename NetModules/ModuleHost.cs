@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,13 @@
 
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using NetModules.Interfaces;
 using NetModules.Classes;
 using NetModules.Events;
-using NetModules.Interfaces;
 
 namespace NetModules
 {
@@ -196,6 +198,19 @@ namespace NetModules
         /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
         /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
         /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
+        /// that will bee invisible to the current instance of <see cref="IModuleHost"/> and all other modules.
+        /// </summary>
+        public virtual async Task<bool> CanHandleAsync(IEvent e)
+        {
+            return await Task.Run(() => CanHandle(e));
+        }
+
+
+        /// <summary>
+        /// <see cref="ModuleHost"/> implements <see cref="IEventHandler"/> and exposes its methods so that a <see cref="IModule"/>
+        /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
+        /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
+        /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
         /// that will be invisible to the <see cref="IModuleHost"/> and all other modules.
         /// </summary>
         public virtual void Handle(IEvent e)
@@ -228,6 +243,22 @@ namespace NetModules
                     _EventsInProgress.Remove(id);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// <see cref="ModuleHost"/> implements <see cref="IEventHandler"/> and exposes its methods so that a <see cref="IModule"/>
+        /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
+        /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
+        /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
+        /// that will be invisible to the <see cref="IModuleHost"/> and all other modules.
+        public virtual async Task<IEvent> HandleAsync(IEvent e, CancellationToken cancellationToken)
+        {
+            return await Task.Run(() =>
+            {
+                Handle(e);
+                return e;
+            }, cancellationToken);
         }
 
 

@@ -24,13 +24,17 @@
  */
 
 using System;
-using NetModules.Interfaces;
 
-namespace NetModules.Events
+namespace NetModules.Interfaces
 {
     /// <summary>
-    /// This <see cref="IEventOutput"/> is intentionally empty and be used where no output data is required.
+    /// Contains an array of <see cref="ModuleName"/>s that are strictly allowed to handle this <see cref="IEventHandler"/>.
     /// </summary>
-    [Serializable]
-    public struct EmptyEventOutput : IEventOutput { }
+    public interface IEventHandlerAttribute
+    {
+        /// <summary>
+        /// Contains an array of <see cref="ModuleName"/>s that are strictly allowed to handle this <see cref="IEventHandler"/>.
+        /// </summary>
+        string[] ModuleNames { get; }
+    }
 }

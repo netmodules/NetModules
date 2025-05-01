@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@ cancellationSource.CancelAfter(5000);
 
 var @event = new CancellableEventModuleEvent();
 @event.SetCancelToken(cancellationSource.Token);
+
 
 host.Handle(@event);
 

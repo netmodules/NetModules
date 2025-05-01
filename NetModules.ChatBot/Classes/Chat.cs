@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ namespace NetModules.ChatBot
             { new PhraseList(true) { "im", "going", "leaving", "need", "to", "go", "leave", "now", "soon" }, new List<string>() { "I guess we'll chat later then?", "It was nice talking to you", "It was good chatting, I hope I see you again soon!" } },
             { new PhraseList(true) { "who", "are", "what", "you", "called", "your", "name" }, new List<string>() { "my name is chatbot, thank you for asking.", "I'm called chatbot, what's your name?" } },
             { new PhraseList(true) { "im", "i", "called", "my", "name" }, new List<string>(){ "{setname}" } },
-            { new PhraseList() { "who", "what", "am", "i", "called", "remember", "remembered", "forgot", "forgotten", "know", "my", "name" }, new List<string>(){ "{hasname}" } },
+            { new PhraseList(true) { "can", "do", "you", "who", "what", "am", "i", "called", "remember", "remembered", "forgot", "forgotten", "know", "my", "name" }, new List<string>(){ "{hasname}" } },
             { new PhraseList(true) { "what", "are", "you", "today" }, new List<string>() { "I'm a chatbot. I'm the AI equivalent to a 1980s toaster!", "I'm a machine...", "I'm sure you know I'm a chatbot? You're the one talking to me!" } },
             { new PhraseList() { "what", "wa", "were", "have", "been", "doing", "up", "to", "today", "thi", "last", "evening", "morning", "tonight", "night", "week", "month", "on", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" }, new List<string>() { "Nothing much, I've just been hanging around inside this computer!", "I looked at some ones and zeros, how about you?", "Spied on people through the webcam, how about you?" } },
             { new PhraseList() { "what", "are", "you", "doing", "up", "to", "today", "thi", "evening", "morning", "tonight", "night", "week", "month", "on", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" }, new List<string>() { "Nothing much, I'm just hanging around inside this computer!", "Are you asking me out on a date?", "I'm washing my hair and reading a book about A.I.", "Why don't you tell me what you're doing?" } },
@@ -240,82 +240,75 @@ namespace NetModules.ChatBot
             }
 
             var responses = Phrases.Keys.Where(p => p.Intersect(split).Count() > 0)
-                .OrderByDescending(p => p.Intersect(split).Count()).AsEnumerable();
+                .OrderByDescending(p => p.Intersect(split).Count()).ToList().AsEnumerable();
 
             if (responses.Count() > 0)
             {
-                var requests = responses.First();
-
-                if (responses.Count() > 1)
+                foreach (var requests in responses)
                 {
-                    var alternateWords = split.Where(s => !requests.Contains(s));
-
-                    if (alternateWords.Count() > 0)
+                    if (responses.Count() > 1)
                     {
-                        while (requests.AllMust)
+                        var alternateWords = split.Where(s => !requests.Contains(s)).ToList();
+
+                        if (alternateWords.Count() > 0)
                         {
-                            if (requests.AllowExtra == alternateWords.Count())
+                            while (requests.AllMust)
                             {
-                                break;
-                            }
-
-                            if (requests.SetName && string.IsNullOrEmpty(Name))
-                            {
-                                request = string.Join(' ', request.Split(' ').Where(s => !requests.Contains(s)));
-
-                                if (string.IsNullOrEmpty(request) || request.Split(' ').Length > 3)
+                                if (requests.AllowExtra != alternateWords.Count())
                                 {
-                                    return "You're what?";
-
+                                    break;
                                 }
-                                else
+
+                                if (requests.SetName && string.IsNullOrEmpty(Name))
                                 {
-                                    return SetName(request);
+                                    request = string.Join(' ', request.Split(' ').Where(s => !requests.Contains(s)));
+
+                                    if (string.IsNullOrEmpty(request) || request.Split(' ').Length > 3)
+                                    {
+                                        return "You're what?";
+
+                                    }
+                                    else
+                                    {
+                                        return SetName(request);
+                                    }
+                                }
+
+                                if (responses.Last() == requests)
+                                {
+                                    break;
                                 }
                             }
 
-                            if (responses.Last() == requests)
+                            if (requests.AllMust)
                             {
-                                break;
+                                var alternateResponses = responses.Where(p => p.Intersect(alternateWords).Count() > 0)
+                                    .OrderBy(p => p.Count()).ToList();
                             }
-
-                            responses = responses.Skip(1);
-                            requests = responses.First();
                         }
 
-                        if (requests.AllMust)
+                        if (alternateWords.Any(w => w.Equals(Name, StringComparison.OrdinalIgnoreCase)))
                         {
-                            var alternateResponses = responses.Where(p => p.Intersect(alternateWords).Count() > 0)
-                                .OrderBy(p => p.Count());
-
-                            if (alternateResponses.Count() > 0 && alternateResponses.First().Count < requests.Count)
+                            if (ShouldRespondPersonal(requests, split, out var personal))
                             {
-                                requests = alternateResponses.First();
+                                return personal;
                             }
                         }
                     }
 
-                    if (alternateWords.Any(w => w.Equals(Name, StringComparison.OrdinalIgnoreCase)))
+                    // Some absolutely meaningless random math to stop single words getting through for large phrases.
+                    if (requests.Count / split.Count() < 6)
                     {
-                        if (ShouldRespondPersonal(requests, split, out var personal))
+                        var strings = Phrases[requests];
+                        var response = strings[rnd.Next(0, strings.Count)];
+
+                        if (response.Contains('{'))
                         {
-                            return personal;
+                            response = ReplacePlaceholder(requests, request, response);
                         }
-                    }
-                }
-                
-                // Some absolutely meaningless random math to stop single words getting through for large phrases.
-                if (requests.Count / split.Count() < 6)
-                {
-                    var strings = Phrases[requests];
-                    var response = strings[rnd.Next(0, strings.Count)];
 
-                    if (response.Contains('{'))
-                    {
-                        response = ReplacePlaceholder(requests, request, response);
+                        return response;
                     }
-
-                    return response;
                 }
             }
 

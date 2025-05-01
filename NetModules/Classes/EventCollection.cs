@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using NetModules.Events;
 using NetModules.Interfaces;
+using NetModules.Events;
 
 namespace NetModules.Classes
 {
@@ -41,6 +41,7 @@ namespace NetModules.Classes
         private bool Imported;
 
         IDictionary<Type, IEvent> Instantiated;
+        IList<Uri> EventPaths = new List<Uri>();
 
         internal EventCollection(IModuleHost host)
         {
@@ -60,6 +61,8 @@ namespace NetModules.Classes
 
             Host.Log(LoggingEvent.Severity.Debug, $"Importing {events.Count} events...");
 
+            EventPaths = events.Select(e => new Uri(e.Assembly.Location)).Distinct().ToList();
+
             AddRange(events);
 
             foreach (var @event in events)
@@ -78,6 +81,13 @@ namespace NetModules.Classes
 
             Imported = true;
             Host.Log(LoggingEvent.Severity.Debug, $"Events imported.");
+        }
+
+
+        /// <inheritdoc/>
+        public IList<Uri> GetEventAssemblyLocations()
+        {
+            return EventPaths;
         }
 
 

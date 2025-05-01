@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -69,19 +69,17 @@ namespace NetModules.TestApplication
 
             var modulesList = host.Modules.GetModulesByType<IModule>();
 
-            if (modulesList.Count == 0)
+            if (!host.Modules.GetLoadedModules().Select(m => m.ModuleAttributes.Name).Contains("NetModules.ChatBot.ChatModule"))
             {
-                host.Modules.LoadModule(names.First());
+                host.Modules.LoadModule("NetModules.ChatBot.ChatModule");
             }
 
-            var chatBotModule = host.Modules.GetModulesByType<ChatBot.ChatModule>()[0];
+            var chatBotModule = host.Modules.GetModulesByType<ChatBot.ChatModule>().FirstOrDefault();
 
-            if (!string.IsNullOrWhiteSpace(chatBotModule.ModuleAttributes.Name))
-            {
-                Console.WriteLine(chatBotModule.ModuleAttributes.Name);
-            }
 
             // Writing console lines here has nothing to do with the functionality of NetModules
+            Console.WriteLine();
+            Console.WriteLine();
             Console.WriteLine("...");
             Console.WriteLine("...");
 
@@ -89,6 +87,8 @@ namespace NetModules.TestApplication
 
             Console.WriteLine("...");
             Console.WriteLine("...");
+            Console.WriteLine();
+            Console.WriteLine();
 
             // Purely for testing to ensure we have an event.
             var testSolidEvent = host.Events.GetSolidEventFromName("NetModules.ChatBot.ChatModuleEvent");

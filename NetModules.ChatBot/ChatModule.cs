@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -139,22 +139,22 @@ namespace NetModules.ChatBot
 
         public override void OnLoading()
         {
-            Console.WriteLine($"{ModuleAttributes.Name} Loading...");
+            Console.WriteLine($"{ModuleAttributes.Name}.OnLoading() method has been invoked...");
         }
 
         public override void OnLoaded()
         {
-            Console.WriteLine($"{ModuleAttributes.Name} Loaded.");
+            Console.WriteLine($"{ModuleAttributes.Name}.OnLoaded() method has been invoked.");
         }
 
         public override void OnUnloading()
         {
-            Console.WriteLine($"{ModuleAttributes.Name} Unloading...");
+            Console.WriteLine($"{ModuleAttributes.Name}.OnUnloading() method has been invoked...");
         }
 
         public override void OnUnloaded()
         {
-            Console.WriteLine($"{ModuleAttributes.Name} Unloaded.");
+            Console.WriteLine($"{ModuleAttributes.Name}.OnUnloaded() method has been invoked.");
         }
     }
 }

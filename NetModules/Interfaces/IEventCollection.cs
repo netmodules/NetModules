@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -67,5 +67,11 @@ namespace NetModules.Interfaces
         /// Should return a list of all event types known to the current instance of <see cref="IModuleHost"/>.
         /// </summary>
         IList<Type> GetKnownEventTypes();
+
+
+        /// <summary>
+        /// Return a list of all Events assembly locations to the current instance of <see cref="IModuleHost"/>.
+        /// </summary>
+        IList<Uri> GetEventAssemblyLocations();
     }
 }

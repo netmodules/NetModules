@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,8 @@ namespace NetModules.Classes
         /// are also ModuleHosts themselves, it is a good idea nest modules one directory level deep followed by nesting submodules another
         /// level deep. This will isolate parent module events from submodule events.
         /// </summary>
-        /// <param name="path">Where to search for DLL's that export IEvent.</param>
+        /// <param name="host">The <see cref="IModuleHost"/> instance that is searching for <see cref="IEvent"/>s.</param>
+        /// <param name="path">Where to search for DLL's that export <see cref="IEvent"/>.</param>
         /// <param name="directoryDepth">How many subdirectories deep of path be searched.</param>
         public static IList<Type> FindEvents<T>(IModuleHost host, Uri path, int directoryDepth = int.MaxValue) where T : IEvent
         {
@@ -108,7 +109,7 @@ namespace NetModules.Classes
 
             if (!Directory.Exists(path.LocalPath))
             {
-                throw new ArgumentException(string.Format("Invalid basePath specified (does not exist): {0}", path.LocalPath));
+                throw new ArgumentException($"Invalid starting path specified (does not exist): {path.LocalPath}", nameof(path));
             }
 
             var dlls = Directory.GetFiles(path.LocalPath, "*.dll", SearchOption.AllDirectories).ToList();
@@ -138,10 +139,18 @@ namespace NetModules.Classes
 
                 if (assembly == null)
                 {
-                    host.Log(Events.LoggingEvent.Severity.Error
-                        , message
-                        , assemblyPath
-                        , type.FullName);
+                    // TODO:
+                    // Check why exe file throws an Exception
+                    // "Could not load file or assembly '[PATH]'. The module was expected to contain an assembly manifest."
+                    // For now, ignore...
+                    if (!assemblyPath.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        host.Log(Events.LoggingEvent.Severity.Error
+                            , message
+                            , assemblyPath
+                            , type.FullName);
+                    }
+
                     return ret;
                 }
 

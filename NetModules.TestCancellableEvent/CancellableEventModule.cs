@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -73,13 +73,22 @@ namespace NetModules.TestCancellableEvent
                 {
                     while (true)
                     {
+                        // All we're doing in this event handler is sleeping for 100ms and
+                        // checking if the event has been cancelled. This will force into
+                        // the catch block if the event is cancelled. and we can check that
+                        // CancellableEventModuleEvent functionality works.
                         @event.CancellationToken.ThrowIfCancellationRequested();
                         Thread.Sleep(100);
                     }
 
+                    // This code should be unreachable but is left in for clarity:
+                    #pragma warning disable CS0162 // Unreachable code detected.
+                    
                     @event.SetMeta("message", $"The event was completed.");
                     @event.Handled = true;
                     return;
+                    
+                    #pragma warning restore CS0162
                 }
                 catch (Exception ex)
                 {

@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,9 @@
 
 using System;
 using System.Linq;
+using NetModules.Interfaces;
 using NetModules.Classes;
 using NetModules.Events;
-using NetModules.Interfaces;
 
 namespace NetModules
 {
@@ -110,6 +110,16 @@ namespace NetModules
         public abstract void Handle(IEvent e);
 
 
+        /// <summary>
+        /// Implemented due to demand. An object implementing <see cref="IModule"/> may often require the ability to retrieve configurable settings.
+        /// This method is implemented in <see cref="Module"/> and acts as a wrapper for raising a <see cref="GetSettingEvent"/> into the
+        /// <see cref="Host"/> for handling. If a <see cref="Module"/> is not loaded that can handle <see cref="GetSettingEvent"/> then this method
+        /// will fail and attempt to log using <see cref="Module.Log(LoggingEvent.Severity, object[])"/>. Functionality can be overridden.
+        /// </summary>
+        /// <typeparam name="T">The type of the required setting.</typeparam>
+        /// <param name="name">The identifier string for the required setting. This is passed to the generated <see cref="IEventInput"/>.</param>
+        /// <param name="default">The default setting to return if a configured setting is not available or the returned setting is the wrong type.</param>
+        public virtual T GetSetting<T>(string name, T @default = default) => GetSetting(name, @default, false);
 
         /// <summary>
         /// Implemented due to demand. An object implementing <see cref="IModule"/> may often require the ability to retrieve configurable settings.
@@ -120,7 +130,8 @@ namespace NetModules
         /// <typeparam name="T">The type of the required setting.</typeparam>
         /// <param name="name">The identifier string for the required setting. This is passed to the generated <see cref="IEventInput"/>.</param>
         /// <param name="default">The default setting to return if a configured setting is not available or the returned setting is the wrong type.</param>
-        public virtual T GetSetting<T>(string name, T @default = default)
+        /// <param name="suppressLogMessage">Set to true if you do not wish to raise a <see cref="LoggingEvent"/> if the underlying <see cref="GetSettingEvent"/> is not marked as handled.</param>
+        public virtual T GetSetting<T>(string name, T @default = default, bool suppressLogMessage = false)
         {
             /*
              * This overridable method acts is a wrapper for creating a GetSettingEvent and invoking IModuleHost.Handle on it. If no module exists to handle the
@@ -165,10 +176,16 @@ namespace NetModules
                 return @default;
             }
 
-            Log(LoggingEvent.Severity.Error,
-                new NotImplementedException(
-                    string.Format("No module exists to handle event type of {0} or the handling module is not marking the event as handled.", getSettingEvent.Name)),
-                getSettingEvent);
+            // If the event is not handled, we raise a LoggingEvent to inform the developer that no module exists to handle the event for the requested setting.
+            // This can be suppressed by passing the suppressLogMessage parameter as true, or by a handling module setting a boolean metadata value to true on the
+            // GetSettingEvent for the key "suppressLogMessage". This is useful for modules that may not be able to handle the event but do not want to log an error.
+            if (!suppressLogMessage && !getSettingEvent.GetMeta("suppressLogMessage", false))
+            {
+                Log(LoggingEvent.Severity.Error,
+                    new NotImplementedException(
+                        string.Format("No module exists to handle event type of {0} or the handling module is not marking the event as handled.", getSettingEvent.Name)),
+                    getSettingEvent);
+            }
 
             return @default;
         }

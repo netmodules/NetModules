@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,11 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
-using NetModules.Events;
 using NetModules.Interfaces;
+using NetModules.Attributes;
+using NetModules.Events;
 
 namespace NetModules.Classes
 {
@@ -83,6 +85,15 @@ namespace NetModules.Classes
             if (e == null)
             {
                 return this.Where(module => module.Loaded).ToList();
+            }
+
+            var handler = e.GetType().GetCustomAttribute<EventHandlerAttribute>();
+            
+            if (handler != null && handler.ModuleNames != null && handler.ModuleNames.Length > 0)
+            {
+                return this.Where(module => module.Loaded
+                    && handler.ModuleNames.Any(n => n.Equals(module.ModuleAttributes.Name))
+                    && module.CanHandle(e)).ToList();
             }
 
             return this.Where(module => module.Loaded && module.CanHandle(e)).ToList();
@@ -172,7 +183,7 @@ namespace NetModules.Classes
         {
             if (module == default(ModuleName))
             {
-                throw new ArgumentException("module");
+                throw new ArgumentException(nameof(module));
             }
 
             LoadModules(new List<ModuleName>() { module });
@@ -207,7 +218,7 @@ namespace NetModules.Classes
                 var missing = c.ModuleAttributes.Dependencies.Where(d => !HasModule(d));
                 if (missing.Count() > 0)
                 {
-                    throw new Exception(string.Format("{0} module has missing module dependencies: {1}", c.ModuleAttributes.Name, string.Join(' ', missing)));
+                    throw new Exception(string.Format("{0} module has missing module dependencies: {1}", c.ModuleAttributes.Name, string.Join(", ", missing)));
                 }
             }
 
@@ -227,6 +238,7 @@ namespace NetModules.Classes
                 {
                     Host.Log(LoggingEvent.Severity.Debug, "Initializing module..."
                             , c.ModuleAttributes);
+
                     c.InitializeModule();
                 }
             }
@@ -284,11 +296,29 @@ namespace NetModules.Classes
                 // its dependencies while loading.
                 if (!c.Module.Loaded)
                 {
+                    if (System.Diagnostics.Debugger.IsAttached)
+                    {
+                        // Check if the module assembly contains any events. If it does, we log a warning.
+                        // While this is not an absolute requirement of NetModules architecture, we do this here
+                        // as to try and enforce developers that use NetModules to follow NetModules guidelines
+                        // for scalability and dependency reduction. See documentation.
+                        if (Host.Events != null && Host.Events.GetEventAssemblyLocations().Any(e => e.AbsolutePath.Equals(c.Path.AbsolutePath, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            Host.Log(LoggingEvent.Severity.Warning, "The assembly where this Module is located contains Events."
+                                , "Events should be located in their own assembly to improve scalability and reduce dependencies."
+                                , "While this is not an absolute requirement of NetModules architecture, we raise this message to developers that use NetModules to encourage them follow NetModules guidelines, this is the way!"
+                                , "See NetModules documentation for more information."
+                                , c.ModuleAttributes.Name);
+                        }
+                    }
+
                     Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
                             , c.ModuleAttributes);
+
                     c.Module.OnLoading();
                     c.Module.Loaded = true;
                     c.Module.OnLoaded();
+                    
                     Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
                             , c.ModuleAttributes);
                 }
@@ -300,6 +330,7 @@ namespace NetModules.Classes
                 {
                     Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnAllModulesLoaded()..."
                         , c.ModuleAttributes);
+                    
                     continue;
                 }
 
@@ -308,6 +339,7 @@ namespace NetModules.Classes
                 if (c.Module.Loaded)
                 {
                     c.Module.OnAllModulesLoaded();
+
                     Host.Log(LoggingEvent.Severity.Debug, "Raising all modules loaded event..."
                             , c.ModuleAttributes);
                 }
@@ -324,7 +356,7 @@ namespace NetModules.Classes
         {
             if (module == default(ModuleName))
             {
-                throw new ArgumentException("module");
+                throw new ArgumentException(nameof(module));
             }
 
             UnloadModules(new List<ModuleName>() { module });
@@ -404,11 +436,24 @@ namespace NetModules.Classes
         {
             var type = e.GetType();
             var handler = typeof(IEventPreHandler<>);
-            var handlers = Containers.Where(c =>
-                c.Initialized && c.Module.Loaded && c.ModuleType.GetInterfaces().Any(i =>
-                i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            var handlers = e.GetType().GetCustomAttribute<EventHandlerAttribute>();
+            var preHandlers = null as IEnumerable<IModuleContainer>;
 
-            return handlers.Select(h => h.Module as IEventPreHandler).ToList();
+            if (handlers != null && handlers.ModuleNames != null && handlers.ModuleNames.Length > 0)
+            {
+                preHandlers = Containers.Where(c =>
+                    c.Initialized && c.Module.Loaded
+                        && handlers.ModuleNames.Any(n => n.Equals(c.ModuleAttributes.Name)) && c.ModuleType.GetInterfaces().Any(i =>
+                            i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            }
+            else
+            {
+                preHandlers = Containers.Where(c =>
+                    c.Initialized && c.Module.Loaded && c.ModuleType.GetInterfaces().Any(i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            }
+
+            return preHandlers.Select(h => h.Module as IEventPreHandler).ToList();
         }
 
 
@@ -420,11 +465,24 @@ namespace NetModules.Classes
         {
             var type = e.GetType();
             var handler = typeof(IEventPostHandler<>);
-            var handlers = Containers.Where(c =>
-                c.Initialized && c.Module.Loaded && c.ModuleType.GetInterfaces().Any(i =>
-                i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            var handlers = e.GetType().GetCustomAttribute<EventHandlerAttribute>();
+            var postHandlers = null as IEnumerable<IModuleContainer>;
 
-            return handlers.Select(h => h.Module as IEventPostHandler).ToList();
+            if (handlers != null && handlers.ModuleNames != null && handlers.ModuleNames.Length > 0)
+            {
+                postHandlers = Containers.Where(c =>
+                    c.Initialized && c.Module.Loaded
+                        && handlers.ModuleNames.Any(n => n.Equals(c.ModuleAttributes.Name)) && c.ModuleType.GetInterfaces().Any(i =>
+                            i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            }
+            else
+            {
+                postHandlers = Containers.Where(c =>
+                    c.Initialized && c.Module.Loaded && c.ModuleType.GetInterfaces().Any(i =>
+                        i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            }
+
+            return postHandlers.Select(h => h.Module as IEventPostHandler).ToList();
         }
 
 
@@ -504,11 +562,21 @@ namespace NetModules.Classes
         }
 
 
-        public IModuleContainer this[int index]
+
+        /// <summary>
+        /// Access a module container by its index.
+        /// </summary>
+        public new IModuleContainer this[int index]
         {
+            // For the sake of simplicity, this method uses the same indexer as our implemented List.
+            // This allows us to quickly access modules by their container index.
             get => Containers[index];
         }
 
+
+        /// <summary>
+        /// Access a module container by its <see cref="ModuleName"/>.
+        /// </summary>
         public IModuleContainer this[ModuleName key]
         {
             get => Containers.Where(x => x.ModuleAttributes.Name == key).FirstOrDefault();

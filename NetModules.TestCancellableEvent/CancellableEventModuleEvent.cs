@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,14 @@
     THE SOFTWARE.
  */
 
+using NetModules.Attributes;
 using NetModules.Events;
 using NetModules.Interfaces;
 
 namespace NetModules.TestCancellableEvent
 {
     [Serializable]
+    [EventHandler("NetModules.TestCancellableEvent.CancellableEventModule")]
     public class CancellableEventModuleEvent : CancellableEvent<EmptyEventInput, EmptyEventOutput>
     {
         /// <summary>

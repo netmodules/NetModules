@@ -1,8 +1,8 @@
 ﻿/*
     The MIT License (MIT)
 
-    Copyright (c) 2019 John Earnshaw.
-    Repository Url: https://github.com/johnearnshaw/netmodules/
+    Copyright (c) 2025 John Earnshaw, NetModules Foundation.
+    Repository Url: https://github.com/netmodules/netmodules/
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ namespace NetModules.Interfaces
 {
     /// <summary>
     /// An interface that allows you to inspect an instance of IEvent after it has been processed. It is not advised to modify
-    /// any of the IEvents properties at this point as <see cref="IEventPostHandler{E}.OnHandled(E)"/> may be invoked using
+    /// any of the IEvents properties at this point as <see cref="IEventPostHandler.OnHandled(IEvent)"/> may be invoked using
     /// multi-threading.
     /// </summary>
     public interface IEventPostHandler<T> : IEventPostHandler
