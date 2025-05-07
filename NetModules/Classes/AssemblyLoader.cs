@@ -53,7 +53,7 @@ namespace NetModules.Classes
         {
             if (name == null)
             {
-                throw new Exception("AssemblyLoader name parameter is null.");
+                throw new ArgumentException($"{nameof(AssemblyLoader)} {nameof(name)} argument can not be null.");
             }
 
             AttachEvents();
@@ -70,7 +70,7 @@ namespace NetModules.Classes
         {
             if (path == null || !path.IsFile)
             {
-                throw new Exception("AssemblyLoader path parameter must be a System.Uri that targets a local file.");
+                throw new ArgumentException($"{nameof(AssemblyLoader)} {nameof(path)} argument must be a System.Uri that targets a local file.");
             }
 
             AttachEvents();

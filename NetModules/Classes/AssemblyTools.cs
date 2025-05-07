@@ -61,15 +61,6 @@ namespace NetModules.Classes
         }
 
         
-        ///// <summary>
-        ///// Returns the file location of the loaded assembly that contains the Type
-        ///// </summary>
-        //public static Uri GetPathToAssembly<T>(this T @type) where T : Type
-        //{
-        //    return GetPathToAssembly<T>();
-        //}
-        
-        
         /// <summary>
         /// Returns the file location of the loaded assembly that contains the Type
         /// </summary>

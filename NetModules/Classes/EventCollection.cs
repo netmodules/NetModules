@@ -40,13 +40,13 @@ namespace NetModules.Classes
         internal IModuleHost Host { get; set; }
         private bool Imported;
 
-        IDictionary<Type, IEvent> Instantiated;
+        IDictionary<Type, IEvent> ImportedEvents;
         IList<Uri> EventPaths = new List<Uri>();
 
         internal EventCollection(IModuleHost host)
         {
             Host = host;
-            Instantiated = new Dictionary<Type, IEvent>();
+            ImportedEvents = new Dictionary<Type, IEvent>();
         }
 
 
@@ -54,12 +54,19 @@ namespace NetModules.Classes
         {
             if (Imported)
             {
-                throw new Exception("Events already imported. Importing events multiple times would cause multiple instances of all known events.");
+                Host.Log(LoggingEvent.Severity.Error, Constants._EventsAlreadyImported);
+
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    throw new Exception(Constants._EventsAlreadyImported);
+                }
+
+                return;
             }
 
             var events = TypeManager.FindEvents<IEvent>(Host, Host.WorkingDirectory, 1);
 
-            Host.Log(LoggingEvent.Severity.Debug, $"Importing {events.Count} events...");
+            Host.Log(LoggingEvent.Severity.Debug, string.Format(Constants._EventsImporting, events.Count));
 
             EventPaths = events.Select(e => new Uri(e.Assembly.Location)).Distinct().ToList();
 
@@ -69,18 +76,19 @@ namespace NetModules.Classes
             {
                 try
                 {
-                    Instantiated.Add(@event, TypeManager.InstantiateEvent(@event));
+                    ImportedEvents.Add(@event, TypeManager.InstantiateEvent(@event));
                 }
                 catch (Exception ex)
                 {
                     Host.Log(LoggingEvent.Severity.Error
-                        , "An error occurred while attempting to import an event."
+                        , Constants._EventImportError
+                        , @event.FullName
                         , ex);
                 }
             }
 
             Imported = true;
-            Host.Log(LoggingEvent.Severity.Debug, $"Events imported.");
+            Host.Log(LoggingEvent.Severity.Trace, Constants._EventsImported);
         }
 
 
@@ -94,35 +102,37 @@ namespace NetModules.Classes
         /// <inheritdoc/>
         public IList<EventName> GetKnownEvents()
         {
-            return Instantiated.Values.Select(i => i.Name).ToList();
+            return ImportedEvents.Values.Select(i => i.Name).ToList();
         }
 
 
         /// <inheritdoc/>
         public IList<Type> GetKnownEventTypes()
         {
-            return Instantiated.Keys.ToList();
+            return ImportedEvents.Keys.ToList();
         }
 
 
         /// <inheritdoc/>
         public IEvent GetSolidEventFromName(EventName name)
         {
-            var instantiated = Instantiated.FirstOrDefault(i => i.Value.Name == name);
+            var imported = ImportedEvents.FirstOrDefault(i => i.Value.Name == name);
             
-            if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
+            if (imported.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
             try
             {
-                return TypeManager.InstantiateEvent(instantiated.Key);
+                return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)
             {
                 Host.Log(LoggingEvent.Severity.Error
-                    , "An error occurred while attempting to instantiate an event."
+                    , Constants._EventInstantiateError,
+                    imported.Value.Name.ToString(),
+                    imported.Key.FullName
                     , ex);
             }
 
@@ -133,21 +143,23 @@ namespace NetModules.Classes
         /// <inheritdoc/>
         public IEvent GetSolidEventFromType(Type type)
         {
-            var instantiated = Instantiated.FirstOrDefault(i => i.Key == type);
+            var imported = ImportedEvents.FirstOrDefault(i => i.Key == type);
             
-            if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
+            if (imported.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
             try
             {
-                return TypeManager.InstantiateEvent(instantiated.Key);
+                return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)
             {
                 Host.Log(LoggingEvent.Severity.Error
-                    , "An error occurred while attempting to instantiate an event."
+                    , Constants._EventInstantiateError,
+                    imported.Value.Name.ToString(),
+                    imported.Key.FullName
                     , ex);
             }
 
@@ -158,21 +170,23 @@ namespace NetModules.Classes
         /// <inheritdoc/>
         public IEvent GetSolidEventFromType<T, I, O>() where T : IEvent<I, O> where I : IEventInput where O : IEventOutput
         {
-            var instantiated = Instantiated.FirstOrDefault(i => i.Key == typeof(T));
+            var imported = ImportedEvents.FirstOrDefault(i => i.Key == typeof(T));
             
-            if (instantiated.Equals(default(KeyValuePair<Type, IEvent>)))
+            if (imported.Equals(default(KeyValuePair<Type, IEvent>)))
             {
                 return null;
             }
 
             try
             {
-                return TypeManager.InstantiateEvent(instantiated.Key);
+                return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)
             {
                 Host.Log(LoggingEvent.Severity.Error
-                    , "An error occurred while attempting to instantiate an event."
+                    , Constants._EventInstantiateError,
+                    imported.Value.Name.ToString(),
+                    imported.Key.FullName
                     , ex);
             }
 

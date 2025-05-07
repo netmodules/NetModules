@@ -42,6 +42,8 @@ namespace NetModules.Classes
         IEventPreHandler<IEvent>,
         IEventPostHandler<IEvent>
     {
+        
+
         /// <summary>
         /// The list of imported modules ordered by <see cref="ModuleAttribute.LoadPriority"/>. When <see cref="LoadModules(IList{ModuleName})"/>
         /// is invoked, the modules are loaded in the order they appear in this list.
@@ -148,7 +150,7 @@ namespace NetModules.Classes
 
             var containers = TypeManager.FindModules<Module>(Host, Host.WorkingDirectory, 1);
 
-            Host.Log(LoggingEvent.Severity.Debug, $"Importing {containers.Count} modules...");
+            Host.Log(LoggingEvent.Severity.Trace, string.Format(Constants._ModulesImporting, containers.Count));
 
             // Seems long but allows importing newly installed modules provided they are unique and an instance is not already loaded.
             // Tried to use Linq Exclude method here but didn't seem to be working even though GetHashCode and Equals are correctly
@@ -169,7 +171,7 @@ namespace NetModules.Classes
             // user selection.
             Clear();
             AddRange(Containers.OrderBy(container => container.ModuleAttributes.HandlePriority).Select(container => container as IModule));
-            Host.Log(LoggingEvent.Severity.Debug, $"Modules imported.");
+            Host.Log(LoggingEvent.Severity.Trace, Constants._ModulesImported);
         }
 
 
@@ -218,7 +220,10 @@ namespace NetModules.Classes
                 var missing = c.ModuleAttributes.Dependencies.Where(d => !HasModule(d));
                 if (missing.Count() > 0)
                 {
-                    throw new Exception(string.Format("{0} module has missing module dependencies: {1}", c.ModuleAttributes.Name, string.Join(", ", missing)));
+                    Host.Log(LoggingEvent.Severity.Warning
+                        ,Constants._ModuleMissingDependencies
+                        , c.ModuleAttributes.Name
+                        , missing);
                 }
             }
 
@@ -236,8 +241,9 @@ namespace NetModules.Classes
                 // Initialize the container. This creates an instance of the module using Activator.CreatInstance.
                 if (!c.Initialized)
                 {
-                    Host.Log(LoggingEvent.Severity.Debug, "Initializing module..."
-                            , c.ModuleAttributes);
+                    Host.Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleInitializing
+                        , c.ModuleAttributes);
 
                     c.InitializeModule();
                 }
@@ -253,8 +259,8 @@ namespace NetModules.Classes
                 {
                     if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                     {
-                        Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoading()..."
-                            , c.ModuleAttributes);
+                        Host.Log(LoggingEvent.Severity.Trace, string.Format(Constants._ModuleNotLoaded, $"{c.ModuleAttributes.Name}.OnLoading()...")
+                        , c.ModuleAttributes);
                         continue;
                     }
 
@@ -263,12 +269,14 @@ namespace NetModules.Classes
                     // its dependencies while loading.
                     if (!c.Module.Loaded)
                     {
-                        Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
+                        Host.Log(LoggingEvent.Severity.Trace, Constants._ModuleLoading
                             , c.ModuleAttributes);
+                        
                         c.Module.OnLoading();
                         c.Module.Loaded = true;
                         c.Module.OnLoaded();
-                        Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
+
+                        Host.Log(LoggingEvent.Severity.Trace, Constants._ModuleLoaded
                             , c.ModuleAttributes);
                     }
                 }
@@ -286,7 +294,7 @@ namespace NetModules.Classes
 
                 if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
-                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnLoading()..."
+                    Host.Log(LoggingEvent.Severity.Trace, string.Format(Constants._ModuleNotLoaded, $"{c.ModuleAttributes.Name}.OnLoading()...")
                         , c.ModuleAttributes);
                     continue;
                 }
@@ -302,24 +310,26 @@ namespace NetModules.Classes
                         // While this is not an absolute requirement of NetModules architecture, we do this here
                         // as to try and enforce developers that use NetModules to follow NetModules guidelines
                         // for scalability and dependency reduction. See documentation.
-                        if (Host.Events != null && Host.Events.GetEventAssemblyLocations().Any(e => e.AbsolutePath.Equals(c.Path.AbsolutePath, StringComparison.OrdinalIgnoreCase)))
+                        if (Host.Events != null
+                            && Host.Events.GetEventAssemblyLocations()
+                                .Any(e => e.AbsolutePath.Equals(c.Path.AbsolutePath, StringComparison.OrdinalIgnoreCase)))
                         {
-                            Host.Log(LoggingEvent.Severity.Warning, "The assembly where this Module is located contains Events."
-                                , "Events should be located in their own assembly to improve scalability and reduce dependencies."
+                            Host.Log(LoggingEvent.Severity.Warning, "The assembly where this Module is located contains instantiatable Events."
+                                , "Instantiatable Events should be located in their own assembly to improve scalability and reduce Module to Module dependencies."
                                 , "While this is not an absolute requirement of NetModules architecture, we raise this message to developers that use NetModules to encourage them follow NetModules guidelines, this is the way!"
                                 , "See NetModules documentation for more information."
                                 , c.ModuleAttributes.Name);
                         }
                     }
 
-                    Host.Log(LoggingEvent.Severity.Debug, "Loading module..."
+                    Host.Log(LoggingEvent.Severity.Trace, Constants._ModuleLoading
                             , c.ModuleAttributes);
 
                     c.Module.OnLoading();
                     c.Module.Loaded = true;
                     c.Module.OnLoaded();
-                    
-                    Host.Log(LoggingEvent.Severity.Debug, "Loaded module..."
+
+                    Host.Log(LoggingEvent.Severity.Trace, Constants._ModuleLoaded
                             , c.ModuleAttributes);
                 }
             }
@@ -328,7 +338,7 @@ namespace NetModules.Classes
             {
                 if (!c.Initialized || (modules != null && !modules.Contains(c.ModuleAttributes.Name)))
                 {
-                    Host.Log(LoggingEvent.Severity.Error, "Module is not initialized or modules to load does not contain this module's name. Skipping module.OnAllModulesLoaded()..."
+                    Host.Log(LoggingEvent.Severity.Trace, string.Format(Constants._ModuleNotLoaded, $"{c.ModuleAttributes.Name}..OnAllModulesLoaded()...")
                         , c.ModuleAttributes);
                     
                     continue;
@@ -338,10 +348,11 @@ namespace NetModules.Classes
                 // in the ImportModules method and when the imported modules are added to this collection.
                 if (c.Module.Loaded)
                 {
+                    Host.Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleRaisingAllLoaded 
+                        , c.ModuleAttributes);
+                    
                     c.Module.OnAllModulesLoaded();
-
-                    Host.Log(LoggingEvent.Severity.Debug, "Raising all modules loaded event..."
-                            , c.ModuleAttributes);
                 }
             }
         }
@@ -386,13 +397,17 @@ namespace NetModules.Classes
                 // when ModuleHost calls GetLoadedModules method.
                 if (c.Module != null && c.Module.Loaded)
                 {
-                    Host.Log(LoggingEvent.Severity.Debug, "Unloading module..."
-                            , c.ModuleAttributes);
+                    Host.Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleUnloading
+                        , c.ModuleAttributes);
+                    
                     c.Module.OnUnloading();
                     c.Module.Loaded = false;
                     c.Module.OnUnloaded();
-                    Host.Log(LoggingEvent.Severity.Debug, "Unloaded module..."
-                            , c.ModuleAttributes);
+                    
+                    Host.Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleUnloaded
+                        , c.ModuleAttributes);
                 }
             }
 
@@ -409,9 +424,11 @@ namespace NetModules.Classes
                 // unlock any loaded assemblies.
                 if (c.Initialized)
                 {
+                    Host.Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleDeinitializing
+                        , c.ModuleAttributes);
+
                     c.DeinitializeModule();
-                    Host.Log(LoggingEvent.Severity.Debug, "Deinitialized module..."
-                            , c.ModuleAttributes);
                 }
             }
         }
@@ -526,7 +543,7 @@ namespace NetModules.Classes
                 }
             }
 
-            e.SetMetaValue("handlers", meta);
+            e.SetMetaValue(Constants._MetaHandlers, meta);
 
             OnHandled(e);
         }

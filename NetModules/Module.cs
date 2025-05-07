@@ -167,7 +167,7 @@ namespace NetModules
 
                     Log(LoggingEvent.Severity.Warning,
                         new InvalidCastException(
-                            string.Format("The object returned in GetSettingEvent.Output.Setting is {0}. Expected return type is {1}.", setting.GetType(), type)),
+                            string.Format(Constants._SettingTypeMismatch, setting.GetType(), type)),
                         getSettingEvent);
 
                     return @default;
@@ -179,12 +179,11 @@ namespace NetModules
             // If the event is not handled, we raise a LoggingEvent to inform the developer that no module exists to handle the event for the requested setting.
             // This can be suppressed by passing the suppressLogMessage parameter as true, or by a handling module setting a boolean metadata value to true on the
             // GetSettingEvent for the key "suppressLogMessage". This is useful for modules that may not be able to handle the event but do not want to log an error.
-            if (!suppressLogMessage && !getSettingEvent.GetMeta("suppressLogMessage", false))
+            if (!suppressLogMessage || getSettingEvent.GetMeta(Constants._MetaSurpressLogMessage, false))
             {
-                Log(LoggingEvent.Severity.Error,
-                    new NotImplementedException(
-                        string.Format("No module exists to handle event type of {0} or the handling module is not marking the event as handled.", getSettingEvent.Name)),
-                    getSettingEvent);
+                Log(LoggingEvent.Severity.Error
+                    , string.Format(Constants._SettingNotFound, getSettingEvent.Name)
+                    , getSettingEvent);
             }
 
             return @default;
@@ -317,7 +316,7 @@ namespace NetModules
         /// </summary>
         public static implicit operator string(Module m)
         {
-            return m.ToString();
+            return m.ModuleAttributes.Name.ToString();
         }
 
         #endregion

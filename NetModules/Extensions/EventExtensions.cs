@@ -30,17 +30,17 @@ using NetModules.Interfaces;
 namespace NetModules
 {
     /// <summary>
-    /// 
+    /// Helpful extension methods for working with Event metadata.
     /// </summary>
     [Serializable]
     public static class EventExtensions
     {
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static object GetMetaValue(this IEvent @this, string key, object defaultValue = null)
         {
             object val = defaultValue;
@@ -55,11 +55,11 @@ namespace NetModules
 
 
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static object GetMeta(this IEvent @this, string key, object defaultValue = null)
         {
             return GetMetaValue(@this, key, defaultValue);
@@ -67,11 +67,11 @@ namespace NetModules
 
 
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static T GetMetaValue<T>(this IEvent @this, string key, T defaultValue = default(T))
         {
             object val;
@@ -93,11 +93,11 @@ namespace NetModules
 
 
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static T GetMeta<T>(this IEvent @this, string key, T defaultValue = default(T))
         {
             return GetMetaValue(@this, key, defaultValue);
@@ -105,12 +105,12 @@ namespace NetModules
 
 
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="parser">      </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="parser">Allows you to specify a parser for a matching metadata value to ensure the value is returned in the correct format.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static T GetMetaValue<T>(this IEvent @this, string key, Func<object, T> parser, T defaultValue = default(T))
         {
             object val;
@@ -125,12 +125,12 @@ namespace NetModules
 
 
         /// <summary>
-        /// Gets a meta value on an event
+        /// Gets a meta value on an event.
         /// </summary>
-        /// <param name="this">        </param>
-        /// <param name="key">         </param>
-        /// <param name="parser">      </param>
-        /// <param name="defaultValue"></param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="parser">Allows you to specify a parser for a matching metadata value to ensure the value is returned in the correct format.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static T GetMeta<T>(this IEvent @this, string key, Func<object, T> parser, T defaultValue = default(T))
         {
             return GetMetaValue(@this, key, parser, defaultValue);
@@ -140,19 +140,19 @@ namespace NetModules
         /// <summary>
         /// Check if a key exists in the meta data.
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="key"> </param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
         public static bool HasMeta(this IEvent @this, string key)
         {
             return @this.Meta != null && @this.Meta.ContainsKey(key);
         }
 
-        
+
         /// <summary>
-        /// Remove a key from meta data. True if removed, false if not.
+        /// Remove a key from meta data. returns true if a metadata item is removed, and false if not.
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="key"> </param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
         public static bool DeleteMeta(this IEvent @this, string key)
         {
             if (@this.Meta != null && @this.Meta.ContainsKey(key))
@@ -166,19 +166,23 @@ namespace NetModules
 
 
         /// <summary>
-        /// Remove a key from meta data. True if removed, false if not.
+        /// Remove a key from meta data. returns true if a metadata item is removed, and false if not.
         /// </summary>
-        /// <param name="this"></param>
-        /// <param name="key"> </param>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
         public static bool RemoveMeta(this IEvent @this, string key)
         {
             return DeleteMeta(@this, key);
         }
 
-        
+
         /// <summary>
-        /// Sets a meta key/value pair on an event.
+        /// Sets a metadata key/value pair on an Event.
         /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
+        /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
         public static void SetMetaValue(this IEvent @this, string key, object value, bool forceOverwrite = false)
         {
             if (@this.Meta == null)
@@ -206,8 +210,12 @@ namespace NetModules
 
 
         /// <summary>
-        /// Sets a meta key/value pair on an event.
+        /// Sets a metadata key/value pair on an Event.
         /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
+        /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
         public static void SetMeta(this IEvent @this, string key, object value, bool forceOverwrite = false)
         {
             SetMetaValue(@this, key, value, forceOverwrite);
@@ -215,8 +223,12 @@ namespace NetModules
 
 
         /// <summary>
-        /// Sets a meta key/value pair on an event.
+        /// Sets a metadata key/value pair on an Event.
         /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
+        /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
         public static void AddMeta(this IEvent @this, string key, object value, bool forceOverwrite = false)
         {
             SetMetaValue(@this, key, value, forceOverwrite);

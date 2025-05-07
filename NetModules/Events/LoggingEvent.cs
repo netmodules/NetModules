@@ -41,21 +41,47 @@ namespace NetModules.Events
         public enum Severity
         {
             /// <summary>
-            /// Log a Debug message.
+            /// Raise this severity to log at the most granular level and step-by-step execution of a
+            /// module if required
             /// </summary>
-            Debug,
+            Trace = -1,
             /// <summary>
-            /// Log an Error message.
+            /// Raise this severity to log detailed information about a module's functionality for debugging
+            /// purposes.
             /// </summary>
-            Error,
+            Debug = 0,
             /// <summary>
-            /// Log an Information message.
+            /// Raise this severity to log data from a module that provides a record of normal operation.
             /// </summary>
-            Information,
+            Information = 1,
             /// <summary>
-            /// Log a Warning message.
+            /// Raise this severity for significant conditions in a module that may require monitoring.
             /// </summary>
-            Warning
+            Notice = 2,
+            /// <summary>
+            /// Raise this severity to signify potential issues in a module that may lead to errors or
+            /// unexpected behavior in the future if not addressed.
+            /// </summary>
+            Warning = 3,
+            /// <summary>
+            /// Raise this severity to indicate error conditions that impair some operation in a module but
+            /// are less severe than critical situations.
+            /// </summary>
+            Error = 4,
+            /// <summary>
+            /// Raise this severity to signify critical conditions in a module that demand intervention to
+            /// prevent system failure.
+            /// </summary>
+            Critical = 5,
+            /// <summary>
+            /// Raise this severity to indicate that a module requires necessary action to resolve a
+            /// critical issue.
+            /// </summary>
+            Alert = Critical,
+            /// <summary>
+            /// Raise this severity to indicate that a module is unusable and requires immediate attention.
+            /// </summary>
+            Emergency = Alert,
         }
 
 

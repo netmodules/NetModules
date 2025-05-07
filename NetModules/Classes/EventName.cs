@@ -23,6 +23,7 @@
     THE SOFTWARE.
  */
 
+using NetModules.Classes;
 using System;
 
 namespace NetModules
@@ -47,7 +48,7 @@ namespace NetModules
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentNullException("The event name can not be a null or empty string.", "value");
+                throw new ArgumentNullException(Constants._NameValueEmpty);
             }
 
             Value = value;
@@ -93,7 +94,7 @@ namespace NetModules
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentNullException("The event name can not be a null or empty string.", "value");
+                throw new ArgumentNullException(Constants._NameValueEmpty);
             }
 
             return new EventName(value);

@@ -29,7 +29,8 @@ using NetModules.Interfaces;
 namespace NetModules.BasicConsoleLogging
 {
     /// <summary>
-    /// A basic console logging module. This module is used to test the console logging functionality of the NetModules.Events.LoggingEvent. It is not intended to be used in production.
+    /// A basic console logging module. This module is used to test the console logging functionality
+    /// of the NetModules.Events.LoggingEvent. It is not intended to be used in production.
     /// </summary>
     [Module(LoadFirst = true, Description = "A basic console logging module. This module is used to test the console logging functionality of the NetModules.Events.LoggingEvent. It is not intended to be used in production.")]
     public class BasicConsoleLoggingModule : Module
@@ -54,10 +55,11 @@ namespace NetModules.BasicConsoleLogging
          * logs to a local file, or a database, and another Module that logs to a 3rd party service,
          * such as Loggly.
          * 
-         * Or what if at a later date you'd like to swap out the Console logging for a file logging?
+         * Or what if at a later date you'd just like to swap out the Console logging for file
+         * logging?
          * 
          * All you need to do is write a fresh handling Module for a LoggingEvent, and job done!
-         * Future scalability proof!
+         * Future scalability-proof!
          * 
          * Because a LoggingEvent inherits from UnhandledEvent, this event will automatically be
          * sent to every loaded Module that returns true for CanHandle(IEvent e) where e is a
@@ -71,12 +73,26 @@ namespace NetModules.BasicConsoleLogging
         {
             if (e is LoggingEvent l)
             {
-                Console.ForegroundColor = l.Input.Severity == LoggingEvent.Severity.Error
-                    || l.Input.Severity == LoggingEvent.Severity.Warning
-                    ? ConsoleColor.Red : ConsoleColor.Cyan;
-                Console.WriteLine($"{this.ModuleAttributes.Name} is writing to Console:\n>[{l.Input.Severity}] {string.Join("\n>", l.Input.Arguments.Select(a => a.ToString()))}");
+                Console.ForegroundColor = GetLoggingColor(l.Input.Severity);
+                Console.Write($"{DateTime.UtcNow.ToString("[yyyy/MM/dd HH:mm:ss.fff]")}: {ModuleAttributes.Name} is writing to Console:\n>[{l.Input.Severity}] {string.Join("\n>", l.Input.Arguments.Select(a => a.ToString()))}");
                 Console.ResetColor();
+                Console.WriteLine();
             }
+        }
+
+
+        private ConsoleColor GetLoggingColor(LoggingEvent.Severity severity)
+        {
+            return severity switch
+            {
+                LoggingEvent.Severity.Trace => ConsoleColor.DarkGray,
+                LoggingEvent.Severity.Debug => ConsoleColor.White,
+                LoggingEvent.Severity.Information
+                    or LoggingEvent.Severity.Notice => ConsoleColor.Cyan,
+                LoggingEvent.Severity.Warning => ConsoleColor.Yellow,
+                LoggingEvent.Severity.Error => ConsoleColor.Red,
+                _ => ConsoleColor.Magenta
+            };
         }
     }
 }

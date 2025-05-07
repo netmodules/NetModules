@@ -60,7 +60,7 @@ namespace NetModules.Classes
 
                 if (attribute == null)
                 {
-                    throw new NotImplementedException(string.Format("{0} Module must be decorated with a ModuleAttribute.", t.Name));
+                    throw new NotImplementedException(string.Format(Constants._TypeManagerNoModuleDecoration, t.Name));
                 }
 
                 attribute.Name = string.Format("{0}.{1}", t.Namespace, t.Name);
@@ -90,7 +90,7 @@ namespace NetModules.Classes
             {
                 if (!t.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEvent<,>)))
                 {
-                    throw new NotImplementedException(string.Format("{0} must implement generic interface type of IEvent<IEventInput, IEventOutput>.", t.Name));
+                    throw new NotImplementedException(string.Format(Constants._TypeManagerNoIEventImplementation, t.Name));
                 }
 
                 events.Add(t);
@@ -109,7 +109,7 @@ namespace NetModules.Classes
 
             if (!Directory.Exists(path.LocalPath))
             {
-                throw new ArgumentException($"Invalid starting path specified (does not exist): {path.LocalPath}", nameof(path));
+                throw new ArgumentException(string.Format(Constants._TypeManagerInvalidPath, path.LocalPath), nameof(path));
             }
 
             var dlls = Directory.GetFiles(path.LocalPath, "*.dll", SearchOption.AllDirectories).ToList();
@@ -127,7 +127,7 @@ namespace NetModules.Classes
         private static IList<Type> GetUseableTypes(IModuleHost host, Uri assemblyPath, Type type)
         {
             var ret = new List<Type>();
-            var message = "Unable to iterate for types in assembly, the assembly was not loaded. The main cause of this is that the assembly is not a valid .NET assembly but may be the result of an underlying exception.";
+            
             
             // Wrapped try/catch for instances where a dll or exe file can not be loaded with .NET reflection, in this case we
             // would presume that the assembly being loaded is not a .NET assembly and therefore can not contain any useable
@@ -146,7 +146,7 @@ namespace NetModules.Classes
                     if (!assemblyPath.AbsolutePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                     {
                         host.Log(Events.LoggingEvent.Severity.Error
-                            , message
+                            , Constants._TypeManagerUnableToIterateAssembly
                             , assemblyPath
                             , type.FullName);
                     }
@@ -167,7 +167,7 @@ namespace NetModules.Classes
             catch (Exception ex)
             {
                 host.Log(Events.LoggingEvent.Severity.Error
-                    , message
+                    , Constants._TypeManagerUnableToIterateAssembly
                     , assemblyPath
                     , type.FullName
                     , ex);
@@ -204,7 +204,7 @@ namespace NetModules.Classes
             }
             catch (Exception ex)
             {
-                throw new Exception("An error occurred while attempting to instantiate a module."
+                throw new Exception(Constants._ModuleInstantiateError
                     , ex);
             }
             
@@ -232,7 +232,7 @@ namespace NetModules.Classes
                     if (!t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEvent<,>)))
                     {
                         throw new Exception(
-                            "A type implementing IEvent interface must use generic arguments IEvent<IEventInput, IEventOutput> to identify the event input and output types."
+                            Constants._TypeManagerNoEventInputOutput
                         );
                     }
 
@@ -241,7 +241,9 @@ namespace NetModules.Classes
             }
             catch (Exception ex)
             {
-                throw new Exception("A type implementing IEvent<IEventInput, IEventOutput> interface must contain a public parameterless constructor.", ex);
+                throw new Exception(
+                    Constants._TypeManagerNoEventConstructor
+                    , ex);
             }
 
             return null;

@@ -24,6 +24,7 @@
  */
 
 using System;
+using System.Runtime.CompilerServices;
 using NetModules.Interfaces;
 
 namespace NetModules
@@ -47,7 +48,7 @@ namespace NetModules
         /// an UnhandledEvent will always continue with propagation to any Module that is registered to handle
         /// it.
         /// </summary>
-        public override bool Handled { get { return false; } set { } }
+        public override bool Handled { get => false; /* set => DO NOTHING!!! */ }
     }
 
 }

@@ -218,7 +218,7 @@ namespace NetModules
             // We generate a unique ID for the event and add it to the IEvent.Meta dictionary. This unique ID can be used to
             // Track and monitor the event during the handling process through the exposed EventsInProgress property.
             var id = GenerateEventId(e);
-            e.SetMetaValue("id", id);
+            e.SetMetaValue(Constants._MetaId, id);
 
             lock (_EventsInProgress)
             {
@@ -252,6 +252,7 @@ namespace NetModules
         /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
         /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
         /// that will be invisible to the <see cref="IModuleHost"/> and all other modules.
+        /// </summary>
         public virtual async Task<IEvent> HandleAsync(IEvent e, CancellationToken cancellationToken)
         {
             return await Task.Run(() =>
