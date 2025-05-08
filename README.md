@@ -6,23 +6,23 @@ NetModules is an open-source architecture designed for constructing scalable, ab
 
 Modern applications demand adaptability and modularity, and NetModules delivers precisely that by enforcing a strict event-handling paradigm. It allows developers to design highly scalable systems where:
 
-- **Event**: Strictly adhere to a predefined interface.
-- **Module**: Declare the capability to handle specific Event types.
-- **ModuleHost**: Serves as intermediary, ensuring efficient communication and delegation of event-handling responsibilities.
+- An **Event** strictly adheres to a predefined interface.
+- A **Module** declares the capability to handle specific Event types.
+- A **ModuleHost** serves as intermediary, ensuring efficient communication and delegation of event-handling responsibilities.
 
 ### Deferred Responsibility & Scalability
 
-This architecture simplifies application scaling and future-proofing—modifications only require changes within the event-handling modules rather than a complete system overhaul.
+This architecture simplifies application scaling and future-proofing, where modifications only require changes within the event-handling modules rather than a complete system overhaul.
 
 #### Example: Logging System Upgrade
 
 Imagine your application currently logs data to a local file system. To migrate to an external logging service, instead of modifying every Module that logs data, you simply build or update a dedicated logging **Module**. Existing modules continue logging events as usual, unaware of the underlying change.
 
-This follows the principle of **deferred responsibility** a Module raises an Event requesting data or a function call, but it does not need to handle the request itself or understand how it is processed. Instead, another Module, designed to handle that Event type, receives and processes the request, ensuring flexibility and separation of concerns.
+This follows the principle of **deferred responsibility**. A Module raises an Event requesting data or a function call, but it does not need to handle the request itself or understand how it is processed. Instead, another Module, designed to handle that Event type, receives and processes the request, ensuring flexibility and separation of concerns.
 
 #### Example: Data Requests Between Modules
 
-A Module may trigger an Event requesting certain data. This Module does **not** need to know where the data comes from or how it is processed—its only concern is receiving the required response. Another Module is responsible for handling the request and determining how and where the data is fetched or computed.
+A Module may trigger an Event requesting certain data. This Module does **not** need to know where the data comes from or how it is processed, its only concern is receiving the required response. Another Module is responsible for handling the request and determining how and where the data is fetched or computed.
 
 ## Key Features
 
