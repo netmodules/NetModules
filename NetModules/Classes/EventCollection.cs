@@ -28,6 +28,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NetModules.Interfaces;
 using NetModules.Events;
+using System.Xml.Linq;
 
 namespace NetModules.Classes
 {
@@ -52,6 +53,10 @@ namespace NetModules.Classes
 
         internal void ImportEvents()
         {
+            // TODO: We may need to allow re-importing events to enable correct hot
+            // reloading for modules where an updated module may depend on or have
+            // implemented more events. Thinking CD/CI...
+
             if (Imported)
             {
                 Host.Log(LoggingEvent.Severity.Error, Constants._EventsAlreadyImported);
@@ -125,6 +130,11 @@ namespace NetModules.Classes
 
             try
             {
+                Host.Log(LoggingEvent.Severity.Trace
+                    , Constants._EventInstantiate
+                    , imported.Value.Name
+                    , imported.Key.FullName);
+                
                 return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)
@@ -152,6 +162,11 @@ namespace NetModules.Classes
 
             try
             {
+                Host.Log(LoggingEvent.Severity.Trace
+                    , Constants._EventInstantiate
+                    , imported.Value.Name
+                    , imported.Key.FullName);
+                
                 return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)
@@ -179,6 +194,11 @@ namespace NetModules.Classes
 
             try
             {
+                Host.Log(LoggingEvent.Severity.Trace
+                    , Constants._EventInstantiate
+                    , imported.Value.Name
+                    , imported.Key.FullName);
+
                 return TypeManager.InstantiateEvent(imported.Key);
             }
             catch (Exception ex)

@@ -35,6 +35,8 @@ namespace NetModules.BasicConsoleLogging
     [Module(LoadFirst = true, Description = "A basic console logging module. This module is used to test the console logging functionality of the NetModules.Events.LoggingEvent. It is not intended to be used in production.")]
     public class BasicConsoleLoggingModule : Module
     {
+        bool DisableTraceLogging = false;
+
         /*
          * This testing Module is designed to simply log any LoggingEvent that is raised by either
          * Module.Log(), Host.Log(), or by raising a LoggingEvent to Host.Handle() directly, to the
@@ -73,11 +75,23 @@ namespace NetModules.BasicConsoleLogging
         {
             if (e is LoggingEvent l)
             {
+                if (DisableTraceLogging && l.Input.Severity == LoggingEvent.Severity.Trace)
+                {
+                    return;
+                }
+
                 Console.ForegroundColor = GetLoggingColor(l.Input.Severity);
                 Console.Write($"{DateTime.UtcNow.ToString("[yyyy/MM/dd HH:mm:ss.fff]")}: {ModuleAttributes.Name} is writing to Console:\n>[{l.Input.Severity}] {string.Join("\n>", l.Input.Arguments.Select(a => a.ToString()))}");
                 Console.ResetColor();
                 Console.WriteLine();
             }
+        }
+
+        public override void OnAllModulesLoaded()
+        {
+            Log(LoggingEvent.Severity.Trace, "All modules loaded, disabling Trace logging...");
+            DisableTraceLogging = true;
+            base.OnAllModulesLoaded();
         }
 
 

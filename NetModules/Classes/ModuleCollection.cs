@@ -108,7 +108,19 @@ namespace NetModules.Classes
         /// </summary>
         public virtual IList<IModule> GetModulesByType<T>() where T : IModule
         {
-            return Containers.Where(c => c.Module != null && typeof(T).IsAssignableFrom(c.ModuleType)).Select(c => c.Module as IModule).ToList();
+            var tName = typeof(T).FullName;
+
+            Host.Log(LoggingEvent.Severity.Trace
+                , Constants._ModulesFindByType
+                , tName);
+
+            var modules = Containers.Where(c => c.Module != null && typeof(T).IsAssignableFrom(c.ModuleType)).Select(c => c.Module as IModule).ToList();
+
+            Host.Log(LoggingEvent.Severity.Trace
+                , string.Format(Constants._ModulesFindByTypeFound, modules.Count)
+                , tName);
+            
+            return modules;
         }
 
 
@@ -131,7 +143,7 @@ namespace NetModules.Classes
                 return Containers.Any(c => c.ModuleAttributes.Name == name && c.ModuleAttributes.Version >= min);
             }
 
-            return Containers.Any(c => c.ModuleAttributes.Name == name && (c.ModuleAttributes.Version >= min && c.ModuleAttributes.Version <= max));
+            return Containers.Any(c => c.ModuleAttributes.Name == name && c.ModuleAttributes.Version >= min && c.ModuleAttributes.Version <= max);
         }
 
 
@@ -314,6 +326,8 @@ namespace NetModules.Classes
                             && Host.Events.GetEventAssemblyLocations()
                                 .Any(e => e.AbsolutePath.Equals(c.Path.AbsolutePath, StringComparison.OrdinalIgnoreCase)))
                         {
+                            // Warn developers about NetModules architecture, and the separation of Module/Event libraries.
+                            // Left this here instead of moving to Classes/Constants.cs for readability.
                             Host.Log(LoggingEvent.Severity.Warning, "The assembly where this Module is located contains instantiatable Events."
                                 , "Instantiatable Events should be located in their own assembly to improve scalability and reduce Module to Module dependencies."
                                 , "While this is not an absolute requirement of NetModules architecture, we raise this message to developers that use NetModules to encourage them follow NetModules guidelines, this is the way!"
@@ -451,6 +465,16 @@ namespace NetModules.Classes
         /// </summary>
         public virtual IList<IEventPreHandler> GetPreHandlers(IEvent e)
         {
+            // We don't want to do any trace logging here if the event type is LoggingEvent as this will
+            // cause a LoggingEvent trace loop (StackOverflowException)...
+            var isLoggingEvent = e is LoggingEvent;
+
+            if (!isLoggingEvent)
+            {
+                Host.Log(LoggingEvent.Severity.Trace
+                , Constants._EventPreHandlers);
+            }
+
             var type = e.GetType();
             var handler = typeof(IEventPreHandler<>);
             var handlers = e.GetType().GetCustomAttribute<EventHandlerAttribute>();
@@ -470,6 +494,12 @@ namespace NetModules.Classes
                         i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
             }
 
+            if (!isLoggingEvent)
+            {
+                Host.Log(LoggingEvent.Severity.Trace
+                    , string.Format(Constants._EventPreHandlersFound, preHandlers.Count()));
+            }
+
             return preHandlers.Select(h => h.Module as IEventPreHandler).ToList();
         }
 
@@ -480,6 +510,16 @@ namespace NetModules.Classes
         /// </summary>
         public virtual IList<IEventPostHandler> GetPostHandlers(IEvent e)
         {
+            // We don't want to do any trace logging here if the event type is LoggingEvent as this will
+            // cause a LoggingEvent trace loop (StackOverflowException)...
+            var isLoggingEvent = e is LoggingEvent;
+
+            if (!isLoggingEvent)
+            {
+                Host.Log(LoggingEvent.Severity.Trace
+                , Constants._EventPostHandlers);
+            }
+
             var type = e.GetType();
             var handler = typeof(IEventPostHandler<>);
             var handlers = e.GetType().GetCustomAttribute<EventHandlerAttribute>();
@@ -497,6 +537,12 @@ namespace NetModules.Classes
                 postHandlers = Containers.Where(c =>
                     c.Initialized && c.Module.Loaded && c.ModuleType.GetInterfaces().Any(i =>
                         i.IsGenericType && i.GetGenericTypeDefinition() == handler && i.GenericTypeArguments[0].IsAssignableFrom(type)));
+            }
+
+            if (!isLoggingEvent)
+            {
+                Host.Log(LoggingEvent.Severity.Trace
+                    , string.Format(Constants._EventPostHandlersFound, postHandlers.Count()));
             }
 
             return postHandlers.Select(h => h.Module as IEventPostHandler).ToList();

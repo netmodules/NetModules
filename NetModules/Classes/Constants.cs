@@ -21,8 +21,13 @@ namespace NetModules.Classes
         internal const string _EventsAlreadyImported = "Events already imported. Importing events multiple times will cause multiple instances of all known events.";
         internal const string _EventsImporting = "Importing {0} events...";
         internal const string _EventImportError = "An error occurred while attempting to import an event.";
+        internal const string _EventInstantiate = "Instantiating solid event...";
         internal const string _EventInstantiateError = "An error occurred while attempting to instantiate an event.";
         internal const string _EventsImported = "Events imported.";
+        internal const string _EventPreHandlers = "Fetching event prehandlers...";
+        internal const string _EventPostHandlers = "Fetching event posthandlers...";
+        internal const string _EventPreHandlersFound = "Returning {0} event prehandlers.";
+        internal const string _EventPostHandlersFound = "Returning {0} event posthandlers.";
 
         internal const string _ModuleNotLoaded = "Module is not initialized or modules to load does not contain this module's name. Skipping {0}";
         internal const string _ModulesImporting = "Importing {0} modules...";
@@ -40,6 +45,13 @@ namespace NetModules.Classes
         internal const string _ModuleUnloaded = "Module unloaded.";
         internal const string _ModuleUnloadingError = "An error occurred while attempting to unload a module.";
         internal const string _ModuleRaisingAllLoaded = "Raising all modules loaded to module...";
+        internal const string _ModulesFindByType = "Finding modules by type...";
+        internal const string _ModulesFindByTypeFound = "Found {0} modules matching type.";
+
+        internal const string _ModuleHostEventReceived = "Event received...";
+        internal const string _ModuleHostEventProcessed = "Event processed.";
+        internal const string _ModuleHostEventHandled = "Event handled: {0}";
+        internal const string _ModuleHostTotalEventsInStack = "Total events in stack: {0}.";
 
         internal const string _MetaId = "id";
         internal const string _MetaHandlers = "handlers";

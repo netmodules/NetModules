@@ -208,7 +208,9 @@ namespace NetModules
 
             if (arguments != null && arguments.Length > 0)
             {
-                // We insert the module name at index 0 of the arguments array so that it can be output by the LoggingEvent event handler.
+                // We insert the raising module name at index 0 of the arguments array, and raise a
+                // LoggingEvent  on its behalf so that it can processed by any LoggingEvent event
+                // handlers.
                 var loggingEvent = new LoggingEvent
                 {
                     Input = new LoggingEventInput
@@ -218,7 +220,7 @@ namespace NetModules
                     }
                 };
 
-                loggingEvent.Input.Arguments.Insert(0, this.ModuleAttributes.Name);
+                loggingEvent.Input.Arguments.Insert(0, ModuleAttributes.Name);
                 Host.Handle(loggingEvent);
             }
         }

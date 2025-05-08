@@ -180,7 +180,7 @@ namespace NetModules
         /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
         /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
         /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
-        /// that will bee invisible to the current instance of <see cref="IModuleHost"/> and all other modules.
+        /// that will be invisible to the current instance of <see cref="IModuleHost"/> and all other modules.
         /// </summary>
         public virtual bool CanHandle(IEvent e)
         {
@@ -198,7 +198,7 @@ namespace NetModules
         /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
         /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
         /// <see cref="Module.Handle(IEvent)"/> directly. Invoking <see cref="Module.Handle(IEvent)"/> will create a ghost event
-        /// that will bee invisible to the current instance of <see cref="IModuleHost"/> and all other modules.
+        /// that will be invisible to the current instance of <see cref="IModuleHost"/> and all other modules.
         /// </summary>
         public virtual async Task<bool> CanHandleAsync(IEvent e)
         {
@@ -215,6 +215,17 @@ namespace NetModules
         /// </summary>
         public virtual void Handle(IEvent e)
         {
+            // We don't want to do any trace logging here if the event type is LoggingEvent as this will
+            // cause a LoggingEvent trace loop (StackOverflowException)...
+            var isLoggingEvent = e is LoggingEvent;
+
+            if (!isLoggingEvent)
+            {
+                Log(LoggingEvent.Severity.Trace
+                    , Constants._ModuleHostEventReceived
+                    , e is ISensitiveEvent ? e.Name : e);
+            }
+
             // We generate a unique ID for the event and add it to the IEvent.Meta dictionary. This unique ID can be used to
             // Track and monitor the event during the handling process through the exposed EventsInProgress property.
             var id = GenerateEventId(e);
@@ -223,6 +234,13 @@ namespace NetModules
             lock (_EventsInProgress)
             {
                 _EventsInProgress.Add(id, e);
+
+                if (!isLoggingEvent)
+                {
+                    Log(LoggingEvent.Severity.Trace
+                    , string.Format(Constants._ModuleHostTotalEventsInStack
+                    , _EventsInProgress.Count));
+                }
             }
 
             // Added try/finally block to ensure that events that throw an exception are still removed from the EventsInProgress
@@ -237,10 +255,24 @@ namespace NetModules
             }
             finally
             {
+                if (!isLoggingEvent)
+                {
+                    Log(LoggingEvent.Severity.Trace
+                        , Constants._ModuleHostEventProcessed, string.Format(Constants._ModuleHostEventHandled, e is IUnhandledEvent ? "Unhandleable" : e.Handled)
+                        , e is ISensitiveEvent ? e.Name : e);
+                }
+
                 // Once the event is completed we need to remove it from the EventsInProgress list.
                 lock (_EventsInProgress)
                 {
                     _EventsInProgress.Remove(id);
+
+                    if (!isLoggingEvent)
+                    {
+                        Log(LoggingEvent.Severity.Trace
+                        , string.Format(Constants._ModuleHostTotalEventsInStack
+                        , _EventsInProgress.Count));
+                    }
                 }
             }
         }
@@ -284,7 +316,8 @@ namespace NetModules
 
             if (arguments != null && arguments.Length > 0)
             {
-                // We insert the application name at index 0 of the arguments array so that it can be output by the LoggingEvent event handler.
+                // We insert the application name at index 0 of the arguments array, and raise a LoggingEvent
+                // so that it can processed by any LoggingEvent event handlers.
                 var loggingEvent = new LoggingEvent
                 {
                     Input = new LoggingEventInput
@@ -294,7 +327,7 @@ namespace NetModules
                     }
                 };
 
-                loggingEvent.Input.Arguments.Insert(0, this.ApplicationName);
+                loggingEvent.Input.Arguments.Insert(0, ApplicationName);
                 Handle(loggingEvent);
             }
         }
