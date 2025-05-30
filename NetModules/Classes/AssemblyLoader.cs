@@ -49,7 +49,7 @@ namespace NetModules.Classes
         /// 
         /// </summary>
         public AssemblyLoader(AssemblyName name, bool keepAlive = false)
-            //: base(!keepAlive)
+            : base(!keepAlive)
         {
             if (name == null)
             {

@@ -23,6 +23,9 @@
     THE SOFTWARE.
  */
 
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace NetModules.Interfaces
 {
     /// <summary>
@@ -31,19 +34,19 @@ namespace NetModules.Interfaces
     public interface IEventHandler
     {
         /// <summary>
-        /// CanHandle can be called by the IEvent host to see if this handler is able to handle the requested event. This
+        /// CanHandle can be invoked by the <see cref="IEventHandler"/> to see if this handler is able to handle the requested event. This
         /// allows the handler to inspect the IEvent and inform the requester if it can be handled without further processing.
         /// </summary>
-        /// <param name="e">The IEvent to inspect for handling.</param>
-        /// <returns></returns>
+        /// <param name="e">The <see cref="IEvent"/> to inspect for handling.</param>
+        /// <returns>True if the <see cref="IEventHandler"/> can handle this <see cref="IEvent"/>.</returns>
         bool CanHandle(IEvent e);
 
 
         /// <summary>
-        /// Pass an IEvent to this EventHandler for it to be processed. All EventHandlers should handle any IEvents that are
-        /// known to the EventHandler within this method.
+        /// Pass an <see cref="IEvent"/> to this <see cref="IEventHandler"/> for it to be processed. All EventHandlers that wish to handle an
+        /// instance of <see cref="IEvent"/> should handle the <see cref="IEvent"/> within this method.
         /// </summary>
-        /// <param name="e">The IEvent to be handled.</param>
+        /// <param name="e">The <see cref="IEvent"/> to be handled.</param>
         void Handle(IEvent e);
     }
 }

@@ -32,7 +32,7 @@ namespace NetModules.Interfaces
     /// <summary>
     /// This interface should be inherited by any class or struct that loads <see cref="IModule"/> types.
     /// </summary>
-    public interface IModuleHost : IEventHandler
+    public interface IModuleHost : IEventHandler, IEventHandlerAsync<IModuleHost>, IEventTryHandler<IModuleHost>
     {
         /// <summary>
         /// The arguments that are passed to the executing application while it is launching. This allows instances implementing IModule

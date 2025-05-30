@@ -35,12 +35,13 @@ namespace NetModules.Interfaces
     public interface IModule : IEventHandler
     {
         /// <summary>
-        /// Each module requires a reference to the IModuleHost that parents the module. Make sure you set this property!
+        /// Each module requires a reference to the <see cref="IModuleHost"/> that parents the module. Make sure you set this property when
+        /// using the <see cref="NetModules.Interfaces"/> namespace to create your own implementation!
         /// </summary>
         IModuleHost Host { get; }
 
         /// <summary>
-        /// Attributes contains the standard information about the instance implementing IModule such as its name, description and
+        /// Attributes contains the standard information about the instance implementing IModule such as its name, version, description and
         /// any dependencies.
         /// </summary>
         IModuleAttribute ModuleAttributes { get; }

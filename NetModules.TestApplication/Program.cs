@@ -28,16 +28,18 @@ using NetModules.Interfaces;
 using NetModules.ChatBot.Events;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NetModules.TestApplication
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             //AppDomain.CurrentDomain.TypeResolve += CurrentDomain_TypeResolve;
-            Launch(args);
+            await Launch(args);
         }
 
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -50,7 +52,7 @@ namespace NetModules.TestApplication
             return null;
         }
 
-        static void Launch(string[] args)
+        static async Task Launch(string[] args)
         {
             
             // Create a new module host
@@ -131,10 +133,10 @@ namespace NetModules.TestApplication
                 };
 
                 // We don't really need to call CanHandle but currently used good for debugging.
-                if (host.CanHandle(e))
+                if (await host.CanHandleAsync(e))
                 {
                     // Here's the magic...
-                    host.Handle(e);
+                    await host.HandleAsync(e, CancellationToken.None);
                 }
                 else
                 {

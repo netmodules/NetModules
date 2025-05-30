@@ -279,6 +279,19 @@ namespace NetModules
 
 
         /// <summary>
+        /// This method works the same as <see cref="Handle(IEvent)"/>, and is used to handle an <see cref="IEvent"/> and return the same
+        /// <see cref="IEvent"/> back to the caller. This is useful when instantiating an <see cref="IEvent"/> for handling within its own
+        /// "if" closure and provides access to the instantiated <see cref="IEvent"/> through the outEvent parameter.
+        /// </summary>
+        public virtual bool TryHandle(IEvent inEvent, out IEvent outEvent)
+        {
+            Handle(inEvent);
+            outEvent = inEvent;
+            return inEvent.Handled;
+        }
+
+
+        /// <summary>
         /// <see cref="ModuleHost"/> implements <see cref="IEventHandler"/> and exposes its methods so that a <see cref="IModule"/>
         /// instance can check to see if an <see cref="IEvent"/> instance can be handled and pass it to <see cref="ModuleHost.Handle(IEvent)"/>
         /// for handling. It is recommended to always use <see cref="IModuleHost"/> to handle events rather than invoking
@@ -289,6 +302,11 @@ namespace NetModules
         {
             return await Task.Run(() =>
             {
+                if (e is ICancellable c && c.CancellationToken != cancellationToken)
+                {
+                    c.SetCancelToken(cancellationToken);
+                }
+
                 Handle(e);
                 return e;
             }, cancellationToken);
