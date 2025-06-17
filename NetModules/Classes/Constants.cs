@@ -50,6 +50,7 @@ namespace NetModules.Classes
 
         internal const string _ModuleHostEventReceived = "Event received...";
         internal const string _ModuleHostEventProcessed = "Event processed.";
+        internal const string _ModuleHostEventException = "Event handling threw an exception.";
         internal const string _ModuleHostEventHandled = "Event handled: {0}";
         internal const string _ModuleHostTotalEventsInStack = "Total events in stack: {0}.";
 

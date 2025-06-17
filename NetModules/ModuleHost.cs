@@ -253,6 +253,19 @@ namespace NetModules
                     _ModuleCollection.Handle(e);
                 }
             }
+            catch(Exception ex)
+            {
+                // If an exception is thrown while handling an event, we attempt to log the exception and the event that caused it.
+                // If the current event is a LoggingEvent, we don't want to log the exception as this may cause a loop.
+                if (!isLoggingEvent)
+                {
+                    Log(LoggingEvent.Severity.Error
+                        , Constants._ModuleHostEventException
+                        , e is ISensitiveEvent ? e.Name : e
+                        , ex);
+
+                }
+            }
             finally
             {
                 if (!isLoggingEvent)
