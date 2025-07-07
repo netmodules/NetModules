@@ -1,6 +1,6 @@
-# NetModules: A Scalable, Abstract Event-Driven Modular Framework
+# NetModules: A Scalable, Abstract, Event-Driven Modular Architecture
 
-NetModules is an open-source architecture designed for constructing scalable, abstract, event-driven modular systems. Initially conceived as a basic demonstration of the Managed Extensibility Framework (MEF), it has since evolved beyond MEF to provide a robust and flexible architecture for developing cross-platform, plugin-based applications.
+NetModules is an abstract open-source architecture designed for constructing scalable, event-driven modular systems. Initially conceived as a basic demonstration of the Managed Extensibility Framework (MEF), it has since evolved beyond MEF to provide a robust and flexible architecture for developing cross-platform, plugin-based applications.
 
 ## Why NetModules?
 
@@ -16,7 +16,7 @@ This architecture simplifies application scaling and future-proofing, where modi
 
 #### Example: Logging System Upgrade
 
-Imagine your application currently logs data to a local file system. To migrate to an external logging service, instead of modifying every Module that logs data, you simply build or update a dedicated logging **Module**. Existing modules continue logging events as usual, unaware of the underlying change.
+Imagine your application currently logs data to a local file system. To migrate to an external logging service, instead of modifying every Module that logs data, you simply build or update a dedicated logging **Module**. Existing modules continue raising logging events as usual, unaware of the underlying change.
 
 This follows the principle of **deferred responsibility**. A Module raises an Event requesting data or a function call, but it does not need to handle the request itself or understand how it is processed. Instead, another Module, designed to handle that Event type, receives and processes the request, ensuring flexibility and separation of concerns.
 
