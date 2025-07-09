@@ -52,7 +52,7 @@ namespace NetModules.ChatBot
         }
 
         /// <summary>
-        /// Phrases contains a dictionary of potential requests and possible responses.
+        /// Phrases contains a dictionary of potential requests and possible responses. #oldschool!
         /// </summary>
         static Dictionary<PhraseList, List<string>> Phrases = new Dictionary<PhraseList, List<string>>()
         {
@@ -75,7 +75,7 @@ namespace NetModules.ChatBot
             { new PhraseList() { "hello", "hi", "hey" }, new List<string>() { "hello, how are you today?", "hi, how are you doing?", "hey there! How are you?" } },
             { new PhraseList() { "it", "wa", "good", "great", "fantastic", "amazing", "awesome", "she", "he", "they", "were" }, new List<string>() { "Glad to hear it!", "I'm happy to hear that, tell me more about it.", "That's good to hear." } },
             { new PhraseList() { "it", "wa", "bad", "terrible", "horrible", "rubbish", "crap", "she", "he", "they", "were" }, new List<string>() { "That's a shame!", "Sorry to hear that.", "Maybe next time will be better?" } },
-            { new PhraseList() { "what", "do", "would", "talk", "chat", "about" }, new List<string>() { "Tell me about anything!", "I'd love to hear what you've done this week?", "You sounds good to me..." } },
+            { new PhraseList() { "what", "do", "would", "talk", "chat", "about" }, new List<string>() { "Tell me about anything!", "I'd love to hear what you've done this week?", "Sounds good to me..." } },
             { new PhraseList() { "that", "great", "amazing", "awesome", "good", "nice", "fine" }, new List<string>() { "I'm glad you like it!", "I'm happy you agree." } },
             { new PhraseList() { "that", "terrible", "aweful", "rubbish", "garbage", "bad", "horrible", "shame" }, new List<string>() { "I know!", "Tell me about it..." } },
             { new PhraseList() { "bye", "chat", "see", "you", "soon", "later" }, new List<string>() { "bye bye.", "see you soon!", "do you really need to leave?" } },
@@ -188,6 +188,11 @@ namespace NetModules.ChatBot
                 IsSetName = false;
                 return $"Okay, I'll keep calling you {Name}";
             }
+            else if (IsSetName && !string.IsNullOrEmpty(Name))
+            {
+                IsSetName = false;
+                return $"I'll just keep calling you {Name}";
+            }
 
             if (!string.IsNullOrEmpty(Name))
             {
@@ -252,6 +257,8 @@ namespace NetModules.ChatBot
 
                         if (alternateWords.Count() > 0)
                         {
+                            var iteration = 0;
+
                             while (requests.AllMust)
                             {
                                 if (requests.AllowExtra != alternateWords.Count())
@@ -274,10 +281,12 @@ namespace NetModules.ChatBot
                                     }
                                 }
 
-                                if (responses.Last() == requests)
+                                if (responses.ElementAt(iteration) == requests)
                                 {
                                     break;
                                 }
+
+                                iteration++;
                             }
 
                             if (requests.AllMust)

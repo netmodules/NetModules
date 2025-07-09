@@ -229,7 +229,7 @@ namespace NetModules
             // We generate a unique ID for the event and add it to the IEvent.Meta dictionary. This unique ID can be used to
             // Track and monitor the event during the handling process through the exposed EventsInProgress property.
             var id = GenerateEventId(e);
-            e.SetMetaValue(Constants._MetaId, id);
+            e.SetMetaValueInternal(Constants._MetaId, id, false, true);
 
             lock (_EventsInProgress)
             {

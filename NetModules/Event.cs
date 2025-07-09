@@ -37,6 +37,13 @@ namespace NetModules
     [Serializable]
     public abstract class Event<I, O> : IEvent<I, O> where I : IEventInput where O : IEventOutput
     {
+        /// <summary>
+        /// Protecting existing <see cref="Meta"/> from being replaced, this field is used to store the
+        /// reference to an existing meta dictionary.
+        /// </summary>
+        Dictionary<string, object> _Meta;
+
+
         /// <inheritdoc/>
         public virtual I Input { get; set; }
 
@@ -50,9 +57,34 @@ namespace NetModules
 
 
         /// <inheritdoc/>
-        public Dictionary<string, object> Meta { get; set; }
+        public Dictionary<string, object> Meta
+        {
+            get
+            {
+                if (_Meta == null)
+                {
+                    _Meta = new Dictionary<string, object>();
+                }
 
+                return _Meta;
+            }
+            set
+            {
+                if (_Meta == null)
+                {
+                    _Meta = value;
+                }
+                else
+                {
+                    foreach (var kvp in value)
+                    {
+                        this.SetMetaValue(kvp.Key, kvp.Value);
+                    }
+                }
+            }
+        }
 
+        
         /// <inheritdoc/>
         public virtual bool Handled { get; set; }
 

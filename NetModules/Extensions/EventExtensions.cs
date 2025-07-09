@@ -25,6 +25,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using NetModules.Classes;
 using NetModules.Interfaces;
 
 namespace NetModules
@@ -36,21 +38,46 @@ namespace NetModules
     public static class EventExtensions
     {
         /// <summary>
-        /// Gets a meta value on an event.
+        /// Reusing constants here for a quick check to ensure protected meta keys that are set internally by
+        /// <see cref="ModuleHost"/> and <see cref="ModuleCollection"/> aren't overwritten by
+        /// <see cref="SetMetaValue(IEvent, string, object, bool)"/>.
+        /// 
+        /// This doesn't stop someone replacing the entire Event.Meta object on an event, due to the <see cref="IEvent"/>
+        /// interface allowing <see cref="IEvent.Meta"/> to be set, but it does prevent accidental overwriting of the
+        /// internal values via these extension methods.
         /// </summary>
-        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
-        /// <param name="key">The key, identifier, or name of the metadata item.</param>
-        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
-        public static object GetMetaValue(this IEvent @this, string key, object defaultValue = null)
-        {
-            object val = defaultValue;
+        static readonly string[] _ProtectedMetaKeys = { Constants._MetaId, Constants._MetaHandlers };
 
-            if (@this.Meta == null || !@this.Meta.TryGetValue(key, out val))
+
+        /// <summary>
+        /// This is the equivalent of <see cref="SetMetaValue(IEvent, string, object, bool)"/>, but allows internal classes
+        /// that are using this extension method to set meta keys that are used internally, namely id, and handlers.
+        /// <see cref="SetMetaValue(IEvent, string, object, bool)"/> is now a wrapper for this method.
+        /// </summary>
+        internal static void SetMetaValueInternal(this IEvent @this, string key, object value, bool forceOverwrite = false, bool setProtected = false)
+        {
+            // Initialize if null, while copying locally fixes any issues with cross-process/cross-domain EventHandlers.
+            var localMeta = @this.Meta == null ? new Dictionary<string, object>() : new Dictionary<string, object>(@this.Meta);
+
+            if (string.IsNullOrEmpty(key) || (_ProtectedMetaKeys.Contains(key) && !setProtected))
             {
-                return defaultValue;
+                @this.Meta = localMeta;
+                return;
             }
 
-            return val;
+            if (localMeta.ContainsKey(key))
+            {
+                if (forceOverwrite)
+                {
+                    localMeta[key] = value;
+                }
+            }
+            else
+            {
+                localMeta.Add(key, value);
+            }
+
+            @this.Meta = localMeta;
         }
 
 
@@ -72,23 +99,44 @@ namespace NetModules
         /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
         /// <param name="key">The key, identifier, or name of the metadata item.</param>
         /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
+        public static object GetMetaValue(this IEvent @this, string key, object defaultValue = null)
+        {
+            return GetMetaValue<object>(@this, key, defaultValue);
+        }
+
+
+        /// <summary>
+        /// Gets a meta value on an event.
+        /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="defaultValue">A value to return if the metadata key or value is not found.</param>
         public static T GetMetaValue<T>(this IEvent @this, string key, T defaultValue = default(T))
         {
             object val;
 
-            if (@this.Meta == null || !@this.Meta.TryGetValue(key, out val))
+            if (@this == null || @this.Meta == null || !@this.Meta.TryGetValue(key, out val))
             {
                 return defaultValue;
             }
 
-            try
+            if (val is T t)
             {
-                return (T)val; // This will likely fail when used with HandleJson method and deserializing since json is passed around as strings will throw invalid cast. Requires bullet proofing
+                return t;
             }
-            catch
+
+            var type = typeof(T);
+
+            if (val is IConvertible conv && type is IConvertible)
             {
-                return defaultValue;
+                try
+                {
+                    return (T)conv.ToType(type, System.Globalization.CultureInfo.InvariantCulture);
+                }
+                catch { }
             }
+            
+            return defaultValue;
         }
 
 
@@ -176,43 +224,24 @@ namespace NetModules
         }
 
 
+
         /// <summary>
         /// Sets a metadata key/value pair on an Event.
         /// </summary>
-        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
         /// <param name="key">The key, identifier, or name of the metadata item.</param>
         /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
         /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
         public static void SetMetaValue(this IEvent @this, string key, object value, bool forceOverwrite = false)
         {
-            if (@this.Meta == null)
-            {
-                @this.Meta = new Dictionary<string, object>();
-            }
-
-            // Copying locally fixes any issues with cross-process/cross-domain EventHandlers.
-            var local = new Dictionary<string, object>(@this.Meta);
-
-            if (local.ContainsKey(key))
-            {
-                if (forceOverwrite)
-                {
-                    local[key] = value;
-                }
-            }
-            else
-            {
-                local.Add(key, value);
-            }
-
-            @this.Meta = local;
+            SetMetaValueInternal(@this, key, value, forceOverwrite, false);
         }
 
 
         /// <summary>
         /// Sets a metadata key/value pair on an Event.
         /// </summary>
-        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
         /// <param name="key">The key, identifier, or name of the metadata item.</param>
         /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
         /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
@@ -225,13 +254,63 @@ namespace NetModules
         /// <summary>
         /// Sets a metadata key/value pair on an Event.
         /// </summary>
-        /// <param name="this">The <see cref="IEvent"/> to select a metadata value from.</param>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
         /// <param name="key">The key, identifier, or name of the metadata item.</param>
         /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
         /// <param name="forceOverwrite">If the metadata value already exists, this must be true if you wish to overwrite it.</param>
         public static void AddMeta(this IEvent @this, string key, object value, bool forceOverwrite = false)
         {
             SetMetaValue(@this, key, value, forceOverwrite);
+        }
+
+
+        /// <summary>
+        /// Sets a metadata key/value pair on an <see cref="IEvent"/> and returns the <see cref="IEvent"/> for processing.
+        /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
+        /// <param name="key">The key, identifier, or name of the metadata item.</param>
+        /// <param name="value">The metadata value to set for the key or identifier, or metavalue name.</param>
+        public static IEvent WithMeta(this IEvent @this, string key, object value)
+        {
+            SetMetaValue(@this, key, value, true);
+            return @this;
+        }
+
+
+        /// <summary>
+        /// Sets a metadata key/value pair on an <see cref="IEvent"/> and returns the <see cref="IEvent"/> for processing.
+        /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
+        /// <param name="values">The metadata values to set for the keys or identifiers, or metavalue names.</param>
+        public static IEvent WithMeta(this IEvent @this, Dictionary<string, object> values)
+        {
+            if (values == null || values.Count == 0)
+            {
+                return @this;
+            }
+
+            return WithMeta(@this, values.ToArray());
+        }
+
+
+        /// <summary>
+        /// Sets a metadata key/value pair on an <see cref="IEvent"/> and returns the <see cref="IEvent"/> for processing.
+        /// </summary>
+        /// <param name="this">The <see cref="IEvent"/> to set a metadata value on.</param>
+        /// <param name="values">The metadata values to set for the keys or identifiers, or metavalue names.</param>
+        public static IEvent WithMeta(this IEvent @this, params KeyValuePair<string, object>[] values)
+        {
+            if (values == null || values.Length == 0)
+            {
+                return @this;
+            }
+
+            foreach (var kvp in values)
+            {
+                SetMetaValue(@this, kvp.Key, kvp.Value, true);
+            }
+            
+            return @this;
         }
     }
 }

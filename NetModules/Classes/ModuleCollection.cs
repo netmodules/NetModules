@@ -589,7 +589,7 @@ namespace NetModules.Classes
                 }
             }
 
-            e.SetMetaValue(Constants._MetaHandlers, meta);
+            e.SetMetaValueInternal(Constants._MetaHandlers, meta, false, true);
 
             OnHandled(e);
         }
