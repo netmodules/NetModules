@@ -15,7 +15,7 @@
 	<PackageProjectUrl>https://netmodules.net/</PackageProjectUrl>
 	<PackageTags>event driven plugins plugin modules module modular framework scalable scaleable abstract architecture</PackageTags>
 	<Description>A modern .NET open-source abstract framework for constructing future-proof-scalable event-driven modular systems. Originally started as a simple project to demonstrate a basic implementation of Microsoft's Managed Extensibility Framework (MEF). It has since evolved beyond MEF, into an advanced framework designed to simplify building cross-platform, event-driven, plugin-based, scalable, and modular applications using .NET and platforms that support .NET 6 class libraries.</Description>
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
   
 </PropertyGroup>
 

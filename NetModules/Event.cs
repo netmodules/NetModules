@@ -78,7 +78,7 @@ namespace NetModules
                 {
                     foreach (var kvp in value)
                     {
-                        this.SetMetaValue(kvp.Key, kvp.Value);
+                        _Meta.TryAdd(kvp.Key, kvp.Value);
                     }
                 }
             }

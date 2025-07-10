@@ -56,7 +56,7 @@ namespace NetModules.ChatBot
         /// </summary>
         static Dictionary<PhraseList, List<string>> Phrases = new Dictionary<PhraseList, List<string>>()
         {
-            { new PhraseList(true, true, 1) { "hello", "hi", "it", "im", "i", "is", "am", "my", "the", "name", "called" }, new List<string>() { "{setname}" } },
+            { new PhraseList(true, true, 1) { "hello", "hi", "it", "im", "i", "is", "am", "my", "the", "name", "called", "whats" }, new List<string>() { "{setname}" } },
             { new PhraseList() { "forget", "me", "my", "name" }, new List<string>() { "{forgetname}" } },
             { new PhraseList() { "no", "i", "didnt", "did", "not", "do", "dont" }, new List<string>() { "Oh, right!" } },
             { new PhraseList() { "ye", "i", "did", "do" }, new List<string>() { "I know!" } },
@@ -167,7 +167,9 @@ namespace NetModules.ChatBot
                     .ElementAt(new Random().Next(0, 1));
             }
 
-            if (string.IsNullOrEmpty(request) || request.Contains(Name, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(request)
+                || request.Contains("whats", StringComparison.OrdinalIgnoreCase)
+                || request.Contains(Name, StringComparison.OrdinalIgnoreCase))
             {
                 return new List<string>() { $"Your name is {Name}, how are you?", $"You told me you're {Name}, I don't have a good memory for much else...", $"You're {Name}, tell me something about you I don't know.", $"You are {Name}, how are you feeling today? Have I asked you already?" }
                     .ElementAt(new Random().Next(0, 3));
