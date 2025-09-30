@@ -31,6 +31,7 @@ namespace NetModules.BasicConsoleLogging
     /// <summary>
     /// A basic console logging module. This module is used to test the console logging functionality
     /// of the NetModules.Events.LoggingEvent. It is not intended to be used in production.
+    /// See <see href="https://github.com/netmodules/NetModules.Logging.LocalLogging">NetModules.Logging.LocalLogging</see> for a production-ready local logging module.
     /// </summary>
     [Module(LoadFirst = true, Description = "A basic console logging module. This module is used to test the console logging functionality of the NetModules.Events.LoggingEvent. It is not intended to be used in production.")]
     public class BasicConsoleLoggingModule : Module
