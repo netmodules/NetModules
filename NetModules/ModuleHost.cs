@@ -91,7 +91,7 @@ namespace NetModules
 
 
         /// <summary>
-        /// The <see cref="IModuleCollection"/> contains any descovered <see cref="Module"/> types and methods to invoke instances
+        /// The <see cref="IModuleCollection"/> contains any discovered <see cref="Module"/> types and methods to invoke instances
         /// of loaded modules.
         /// </summary>
         public virtual IModuleCollection Modules
@@ -297,6 +297,18 @@ namespace NetModules
         /// "if" closure and provides access to the instantiated <see cref="IEvent"/> through the outEvent parameter.
         /// </summary>
         public virtual bool TryHandle(IEvent inEvent, out IEvent outEvent)
+        {
+            Handle(inEvent);
+            outEvent = inEvent;
+            return inEvent.Handled;
+        }
+
+        /// <summary>
+        /// This method works the same as <see cref="Handle(IEvent)"/>, and is used to handle an <see cref="IEvent"/> and return the same
+        /// <see cref="IEvent"/> back to the caller. This is useful when instantiating an <see cref="IEvent"/> for handling within its own
+        /// "if" closure and provides access to the instantiated <see cref="IEvent"/> through the outEvent parameter.
+        /// </summary>
+        public virtual bool TryHandle<E>(E inEvent, out E outEvent) where E: IEvent
         {
             Handle(inEvent);
             outEvent = inEvent;

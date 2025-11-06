@@ -52,7 +52,7 @@ var @event = new CancellableEventModuleEvent();
 @event.SetCancelToken(cancellationSource.Token);
 
 
-host.Handle(@event);
+host.TryHandle<CancellableEventModuleEvent>(@event, out _);
 
 while(!@event.HasMeta("message"))
 {

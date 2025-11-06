@@ -103,7 +103,7 @@ namespace NetModules.Classes
 
 
         /// <summary>
-        /// Returns a descovered instance of <see cref="IModule"/> from a specified type. The module type must have been previously
+        /// Returns a discovered instance of <see cref="IModule"/> from a specified type. The module type must have been previously
         /// discovered by invoking <see cref="ImportModules"/>.
         /// </summary>
         public virtual IList<IModule> GetModulesByType<T>() where T : IModule
