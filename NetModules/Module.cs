@@ -157,25 +157,45 @@ namespace NetModules
                     {
                         return s;
                     }
+                    else if (setting is IConvertible c)
+                    {
+                        // If not, can the setting be converted??
+                        // If the setting can't be the requested type, we log a message suggesting the type format of the setting so that the developer can
+                        // request the setting in the correct format and use casting or an alternative conversion method to format the setting as required.
+                        // An example here is that if the setting is parsed into a dictionary using JSON, the serializer may have parsed a numeric value
+                        // into an incorrect value type. Where a double may be required, the setting may have been parsed into a float. In this case, the
+                        // float setting must be requested using this method and then cast to a double after the setting value is retrieved.
+                        var type = typeof(T);
 
-                    // If the setting is not the requested type, we log a message suggesting the type format of the setting so that the developer can
-                    // request the setting in the correct format and use casting or an alternative conversion method to format the setting as required.
-                    // An example here is that if the setting is parsed into a dictionary using JSON, the serializer may have parsed a numeric value
-                    // into an incorrect value type. Where a double may be required, the setting may have been parsed into a float. In this case, the
-                    // float setting must be requested using this method and then cast to a double after the setting value is retrieved.
-                    var type = typeof(T);
+                        try
+                        {
+                            // Quick TryParse for enum types if the setting contains a string representation. We can use @default to check for an enum type
+                            // here since @default should always contain a default value in the typeof(T) for the requested setting.
+                            if (@default is Enum && setting is string str
+                                && Enum.TryParse(type, str, true, out var pEnum))
+                            {
+                                return (T)pEnum;
+                            }
 
-                    Log(LoggingEvent.Severity.Warning,
-                        new InvalidCastException(
-                            string.Format(Constants._SettingTypeMismatch, setting.GetType(), type)),
-                        getSettingEvent);
+                            return (T)c.ToType(type, System.Globalization.CultureInfo.InvariantCulture);
+                        }
+                        catch
+                        {
+                            // This has to be an invalid cast, so raise a LoggingEvent indefinitely...
+                            Log(LoggingEvent.Severity.Warning,
+                                new InvalidCastException(
+                                    string.Format(Constants._SettingTypeMismatch, setting.GetType(), type)),
+                                getSettingEvent);
 
-                    return @default;
+                            return @default;
+                        }
+                    }
                 }
 
                 return @default;
             }
 
+            // The setting or a GetSettingEvent handler may not exist on purpose???
             // If the event is not handled, we raise a LoggingEvent to inform the developer that no module exists to handle the event for the requested setting.
             // This can be suppressed by passing the suppressLogMessage parameter as true, or by a handling module setting a boolean metadata value to true on the
             // GetSettingEvent for the key "suppressLogMessage". This is useful for modules that may not be able to handle the event but do not want to log an error.
